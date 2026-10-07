@@ -113,8 +113,10 @@ img { max-width: 100%; }
   background: var(--bg-elev); border: 1px solid var(--line);
   padding: 7px 14px 7px 8px; border-radius: 999px;
   font-size: 13.5px; font-weight: 700; box-shadow: var(--card-shadow);
-  white-space: nowrap;
+  white-space: nowrap; text-decoration: none; color: inherit; cursor: pointer;
+  transition: transform .2s var(--ease), box-shadow .2s var(--ease);
 }
+.rank-chip:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -10px rgba(2,86,155,.4); }
 .rank-dot {
   width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
   background: linear-gradient(135deg, var(--primary), var(--accent));
@@ -384,14 +386,15 @@ body.side-open { overflow: hidden; }
 .lesson-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; padding-top: 24px; border-top: 1px solid var(--line); }
 .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 18px; }
 .pager a {
-  flex: 1; display: flex; align-items: center; gap: 10px; padding: 16px 18px;
+  flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center;
+  gap: 4px; padding: 16px 18px;
   background: var(--bg-elev); border: 1px solid var(--line); border-radius: var(--radius);
   text-decoration: none; color: inherit; font-weight: 700; font-size: 14.5px;
   box-shadow: var(--card-shadow); transition: transform .2s var(--ease);
 }
 .pager a:hover { transform: translateY(-2px); }
-.pager a.next { justify-content: flex-end; text-align: right; }
-.pager a span { display: block; font-size: 12px; color: var(--text-3); font-weight: 600; }
+.pager a.next { align-items: flex-end; text-align: right; }
+.pager a span { font-size: 12px; color: var(--text-3); font-weight: 600; }
 .pager a:empty { visibility: hidden; }
 
 /* ---------- DartPad ---------- */
@@ -520,19 +523,20 @@ body.side-open { overflow: hidden; }
 /* ---------- Rank-up modal ---------- */
 .modal-veil {
   position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px;
-  background: rgba(6, 14, 28, .62); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-  opacity: 0; pointer-events: none; transition: opacity .3s;
+  background: rgba(6, 14, 28, .62);
+  opacity: 0; pointer-events: none; transition: opacity .2s;
 }
 .modal-veil.show { opacity: 1; pointer-events: auto; }
-.modal-veil.show .modal { animation: modalPop .5s cubic-bezier(.2,1.35,.32,1) both; }
-@keyframes modalPop {
-  from { transform: scale(.68) translateY(36px); opacity: 0; }
+.modal-veil.show .modal { animation: popIn .42s cubic-bezier(.2,1.4,.3,1) both; }
+@keyframes popIn {
+  from { transform: scale(.7) translateY(28px); opacity: 0; }
   to { transform: none; opacity: 1; }
 }
 .modal {
   background: var(--bg-elev); border-radius: 28px; padding: 40px 34px; text-align: center;
   max-width: 400px; width: 100%; box-shadow: 0 40px 90px -20px rgba(0,0,0,.5);
-  transform: scale(.7) translateY(30px); transition: transform .45s var(--ease); position: relative; overflow: hidden;
+  transform: scale(.94) translateY(8px); opacity: 0;
+  transition: transform .18s ease-in, opacity .18s ease-in; position: relative; overflow: hidden;
 }
 .modal .trophy { font-size: 64px; display: block; margin-bottom: 12px; animation: trophy .7s var(--ease); }
 @keyframes trophy { 0% { transform: scale(0) rotate(-30deg); } 60% { transform: scale(1.3) rotate(8deg); } 100% { transform: scale(1); } }
@@ -548,6 +552,19 @@ body.side-open { overflow: hidden; }
 .modal-ranks .rl-list::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; }
 .modal-ranks .rl-list::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 .modal-ranks .btn-block { flex: none; }
+/* logout confirm: redesigned */
+.modal-logout { max-width: 360px; padding: 34px 30px 26px; }
+.modal-logout .lo-ico { width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 50%;
+  display: grid; place-items: center; background: rgba(239,68,68,.12); color: #ef4444; }
+.modal-logout .lo-ico svg { width: 28px; height: 28px; }
+.modal.modal-logout h2 { font-size: 20px; letter-spacing: -.01em; text-transform: none;
+  color: var(--text); margin-bottom: 8px; }
+.modal-logout p { color: var(--text-3); font-size: 14px; line-height: 1.55; margin: 0 0 22px; }
+.btn-danger { background: #ef4444; color: #fff; }
+.btn-danger:hover { background: #dc2626; transform: translateY(-2px); box-shadow: 0 16px 30px -8px rgba(239,68,68,.5); }
+.btn-danger:active { transform: scale(.96); }
+.btn-quiet { background: transparent; color: var(--text-3); margin-top: 6px; }
+.btn-quiet:hover { background: var(--bg-sunken); color: var(--text); transform: none; box-shadow: none; }
 
 /* ---------- profile ---------- */
 .pf-card { display: flex; align-items: center; gap: 22px; padding: 26px;
@@ -589,7 +606,9 @@ button.auth-btn { border: 1px solid transparent; font-family: inherit; cursor: p
 .auth-err { min-height: 22px; font-size: 13px; font-weight: 700; color: #dc2626; margin: 2px 0 10px; }
 .auth-note { margin: 16px 0 0; font-size: 12.5px; color: var(--text-3); text-align: center; font-weight: 600; }
 #auth-submit:disabled { opacity: .55; }
-.pf-logout { margin-top: 20px; width: 100%; background: var(--bg-elev); border: 1px solid var(--line); color: var(--text-2); }
+.pf-logout { margin-top: 20px; width: 100%; background: #ef4444; border: none; color: #fff; font-weight: 800; }
+.pf-logout:hover { background: #dc2626; transform: translateY(-2px); box-shadow: 0 16px 30px -8px rgba(239,68,68,.5); }
+.pf-logout:active { transform: scale(.98); }
 @media (min-width: 1000px) { .pf-stats { grid-template-columns: repeat(4, 1fr); } }
 .modal .newrank { font-size: 32px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 8px;
   background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
@@ -782,6 +801,16 @@ html, body { overflow-x: hidden; }
   .dartpad-shell iframe { height: 380px; }
   .mobile-top .rank-chip { gap: 7px; padding: 7px 12px 7px 7px; font-size: 12.5px; }
   .mobile-top .rank-chip span:nth-child(2) { display: none; }
+  /* very small phones: keep every topbar control on screen */
+  @media (max-width: 430px) {
+    .mobile-top .mt-bar { gap: 8px !important; padding: 12px 12px 0 !important; }
+    .mobile-top .brand-name { display: none; }
+    .mobile-top .mt-brand { font-size: 15px; }
+    .mobile-top .rank-chip { padding: 5px !important; }
+    .mobile-top .rank-chip .rank-dot { width: 24px; height: 24px; font-size: 12px; }
+    .mobile-top [data-auth][data-compact] .auth-btn { padding: 7px 11px; font-size: 12.5px; }
+    .mobile-top .menu-btn { width: 36px; height: 36px; }
+  }
 }
 
 /* ---------- Reduced motion ---------- */
@@ -816,7 +845,7 @@ html, body { overflow-x: hidden; }
   box-shadow: 0 0 0 5px rgba(246,196,83,.22), 0 14px 30px -10px rgba(224,138,0,.55); }
 .rk-info { width: 100%; min-width: 0; }
 .rk-label { display: block; font-size: 10.5px; font-weight: 800; letter-spacing: .14em;
-  text-transform: uppercase; color: var(--text-3); margin-bottom: 3px; }
+  text-transform: uppercase; color: var(--text-3); margin-bottom: 3px; line-height: 1.6; }
 .rk-info h3 { margin: 0 0 2px; font-size: 21px; letter-spacing: -.01em; }
 .rk-card .pbar { margin-top: 12px; }
 .rk-next { margin-top: 8px; font-size: 13px; font-weight: 600; color: var(--text-2); text-align: center; }
@@ -826,6 +855,8 @@ html, body { overflow-x: hidden; }
   color: var(--text-2); font-size: 16px; font-weight: 800; cursor: pointer;
   display: grid; place-items: center; line-height: 1; }
 .rk-help:active { transform: scale(.92); }
+/* "?" lives in the section header row (in-flow), so it can never overlap card text */
+.section-head .rk-help { position: static; align-self: center; flex: none; width: 30px; height: 30px; font-size: 15px; }
 /* all-ranks modal list */
 .rl-list { margin: 14px 0 18px; max-height: 46vh; overflow-y: auto; text-align: left; }
 .rl-row { display: flex; align-items: center; gap: 12px; padding: 9px 10px; border-radius: 12px; }
@@ -865,7 +896,7 @@ html, body { overflow-x: hidden; }
   .progress-side .rk-label { color: rgba(255,255,255,.75); }
   .progress-side .rk-info h3 { color: #fff; }
   .progress-side .rk-help { background: rgba(255,255,255,.16); border: 1px solid transparent; color: #fff; }
-  .progress-side .section-head { position: relative; margin: 0 0 8px; justify-content: center; }
+  .progress-side .section-head { position: relative; margin: 0 0 8px; justify-content: center; align-items: center; gap: 10px; }
   .progress-side .section-head h2 { font-size: 11px; font-weight: 800; letter-spacing: .24em;
     text-transform: uppercase; color: var(--text-3); }
   .progress-side .rk-card { background: transparent; border: 0; box-shadow: none;
@@ -878,7 +909,7 @@ html, body { overflow-x: hidden; }
   @keyframes rkFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
   .progress-side .rk-info { width: 100%; flex: none; }
   .progress-side .rk-info h3 { font-size: 24px; }
-  .progress-side .rk-help { top: 16px; right: 16px; }
+  .progress-side .rk-help { background: rgba(255,255,255,.16); border: 1px solid transparent; color: #fff; }
   /* --- right: scrollable column --- */
   .progress-main { min-height: 0; overflow-y: auto; overscroll-behavior: contain;
     scrollbar-gutter: stable; padding: 4px 10px 4px 2px;
@@ -1371,13 +1402,11 @@ function logout() {
   veil.className = "modal-veil";
   veil.id = "logout-veil";
   veil.innerHTML = `<div class="modal modal-logout" role="dialog" aria-label="Confirm logout">
-    <div class="trophy">👋</div>
+    <div class="lo-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
     <h2>Log out?</h2>
-    <p style="color:var(--text-3);font-size:14px;margin:0 0 22px">You'll be signed out on this device.</p>
-    <div style="display:flex;gap:10px;justify-content:center">
-      <button class="btn btn-ghost" id="logout-cancel">Cancel</button>
-      <button class="btn btn-primary" id="logout-confirm">Log out</button>
-    </div>
+    <p>You'll be signed out on this device. Your lessons, quiz history and rank stay saved in this browser.</p>
+    <button class="btn btn-danger btn-block" id="logout-confirm">Log out</button>
+    <button class="btn btn-quiet btn-block" id="logout-cancel">Cancel</button>
   </div>`;
   document.body.appendChild(veil);
   const close = () => { veil.classList.remove("show"); setTimeout(() => veil.remove(), 250); };
@@ -1538,7 +1567,7 @@ document.addEventListener("click", (e) => {
 
 /* ---------------- shared bits ---------------- */
 function rankChip() {
-  return `<span class="rank-chip"></span>`;
+  return `<a class="rank-chip" href="#/progress" aria-label="View your progress and ranks"></a>`;
 }
 function pageHead(crumb, title, sub) {
   return `<div class="page-head">${crumb ? `<div class="crumb">${crumb}</div>` : ""}
@@ -1827,7 +1856,6 @@ views.progress = () => {
       <div class="rl-t"><b>${esc(r.name)}</b>${idx === 0 ? `<span>Starting rank</span>` : ""}</div>${mark}</div>`;
   }).join("");
   const rankCard = `<div class="rk-card">
-    <button class="rk-help" id="ranks-help" aria-label="See all ranks">?</button>
     <div class="rk-side">
       <span class="rk-cur-badge">${RANK_ICONS[i]}</span>
       <div class="rk-info"><span class="rk-label">Current rank &middot; Level ${i + 1} of ${RANKS.length}</span>
@@ -1843,7 +1871,7 @@ views.progress = () => {
   return pageHead(null, "Your progress", "Every rank, earned.") +
   `<div class="progress-layout">
   <aside class="progress-side">
-    <div class="section-head"><h2>Ranks</h2></div>
+    <div class="section-head"><h2>Ranks</h2><button class="rk-help" id="ranks-help" aria-label="See all ranks">?</button></div>
     ${rankCard}
   </aside>
   <div class="progress-main">
@@ -2132,15 +2160,15 @@ function shell() {
   const closeSide = () => { sidebar.classList.remove("open"); sveil.classList.remove("show"); sidebar.setAttribute("aria-hidden", "true"); document.body.classList.remove("side-open"); };
   sveil.onclick = closeSide;
   $(".side-close").onclick = closeSide;
-  $$(".side-link").forEach(a => a.addEventListener("click", closeSide));
+  $$(".side-link, .side-foot .rank-chip").forEach(a => a.addEventListener("click", closeSide));
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSide(); });
   // mobile top mini-bar with menu button, rank chip + theme (since topnav is desktop-only)
   const mini = document.createElement("div");
-  mini.innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:14px 18px 0;max-width:920px;margin:0 auto">
+  mini.innerHTML = `<div class="mt-bar" style="display:flex;align-items:center;gap:10px;padding:14px 18px 0;max-width:920px;margin:0 auto">
     <button class="menu-btn" id="menu-btn" aria-label="Open menu"><span></span><span></span><span></span></button>
-    <a href="#/home" style="display:flex;align-items:center;gap:9px;font-weight:800;font-size:17px;text-decoration:none;color:inherit">
-    <span class="brand-mark" style="width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-size:16px;font-weight:900">F</span>FlutterLearn</a>
-    <span style="margin-left:auto;display:flex;gap:8px;align-items:center"><span data-auth data-compact></span>${rankChip()}<button class="theme-btn" style="width:36px;height:36px;font-size:15px" aria-label="Toggle theme">🌙</button></span></div>`;
+    <a href="#/home" class="mt-brand" style="display:flex;align-items:center;gap:9px;font-weight:800;font-size:17px;text-decoration:none;color:inherit">
+    <span class="brand-mark" style="width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-size:16px;font-weight:900">F</span><span class="brand-name">FlutterLearn</span></a>
+    <span class="mt-actions" style="margin-left:auto;display:flex;gap:8px;align-items:center"><span data-auth data-compact></span>${rankChip()}<button class="theme-btn" style="width:36px;height:36px;font-size:15px" aria-label="Toggle theme">🌙</button></span></div>`;
   mini.className = "mobile-top";
   document.body.prepend(mini);
   $("#menu-btn").onclick = openSide;
