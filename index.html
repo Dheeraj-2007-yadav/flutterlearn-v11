@@ -160,6 +160,7 @@ img { max-width: 100%; }
 .sidebar.open { transform: none; }
 @media (min-width: 760px) { .sidebar, .side-veil { display: none; } }
 body.side-open { overflow: hidden; }
+body.modal-open { overflow: hidden; }
 
 .side-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 16px 14px; border-bottom: 1px solid var(--line); }
 .side-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 17px; text-decoration: none; color: inherit; }
@@ -187,6 +188,11 @@ body.side-open { overflow: hidden; }
 .side-link.active .go { opacity: 1; transform: none; }
 
 .side-foot { margin-top: auto; padding: 14px 16px 16px; border-top: 1px solid var(--line); display: grid; gap: 12px; }
+/* mobile topbar stays minimal: login/rank live in the slide menu */
+.mobile-top [data-auth], .mobile-top .rank-chip { display: none; }
+.side-foot .side-auth { display: grid; gap: 10px; }
+.side-foot .side-auth .user-chip { justify-content: center; font-size: 14px; }
+.side-foot .side-auth .auth-btn { width: 100%; padding: 11px; font-size: 14px; }
 .side-theme { width: 100%; border-radius: 14px; height: 48px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; font-weight: 700; }
 #app { flex: 1 0 auto; width: 100%; }
 
@@ -1479,6 +1485,15 @@ function showRankUp(idx) {
   confetti();
 }
 function hideRankUp() { $("#rankup-veil").classList.remove("show"); }
+/* lock background scroll while any modal popup is open (covers every veil, present and future) */
+function syncModalScrollLock() {
+  document.body.classList.toggle("modal-open", !!document.querySelector(".modal-veil.show"));
+}
+if (typeof MutationObserver !== "undefined") {
+  new MutationObserver(syncModalScrollLock).observe(document.body, {
+    childList: true, subtree: true, attributes: true, attributeFilter: ["class"]
+  });
+}
 
 /* ---------------- markdown → html ---------------- */
 function highlightDart(code) {
@@ -2137,6 +2152,7 @@ function shell() {
       ${TABS.map(t => `<a class="side-link" data-match="${t.match[0]}" href="${t.route}"><span class="ico">${t.icon}</span><span>${t.label}</span><span class="go">→</span></a>`).join("")}
     </nav>
     <div class="side-foot">
+      <div class="side-auth" data-auth></div>
       ${rankChip()}
       <button class="theme-btn side-theme" aria-label="Toggle theme"><span class="ti">🌙</span><span>Theme</span></button>
     </div>
@@ -2160,7 +2176,11 @@ function shell() {
   const closeSide = () => { sidebar.classList.remove("open"); sveil.classList.remove("show"); sidebar.setAttribute("aria-hidden", "true"); document.body.classList.remove("side-open"); };
   sveil.onclick = closeSide;
   $(".side-close").onclick = closeSide;
-  $$(".side-link, .side-foot .rank-chip").forEach(a => a.addEventListener("click", closeSide));
+  $$(".side-link").forEach(a => a.addEventListener("click", closeSide));
+  // delegate: sidebar nav, rank chip, and auth buttons (login/logout) all close the menu (survives auth re-renders)
+  sidebar.addEventListener("click", (e) => {
+    if (e.target.closest(".side-link, .rank-chip, .side-auth a, .side-auth button")) closeSide();
+  });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSide(); });
   // mobile top mini-bar with menu button, rank chip + theme (since topnav is desktop-only)
   const mini = document.createElement("div");
