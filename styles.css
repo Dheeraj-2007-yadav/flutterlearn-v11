@@ -189,3 +189,16 @@
 .res-status.ok{color:#16a34a;font-weight:600}
 .res-status.err{color:#dc2626;font-weight:600}
 @media(max-width:640px){#res-admin{padding:20px}#res-admin .btn-blue{width:100%;align-self:stretch}}
+
+/* ---- Resource edit (admin) ---- */
+.resb-edit-row{display:flex;justify-content:flex-end;margin-bottom:10px}
+.resb-edit-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--text-2);background:var(--bg-sunken);border:1px solid var(--line);border-radius:999px;padding:7px 16px;cursor:pointer;transition:all .2s}
+.resb-edit-btn svg{width:14px;height:14px}
+.resb-edit-btn:hover{color:var(--primary);border-color:var(--accent)}
+[data-theme=dark] .resb-edit-btn:hover{color:var(--accent)}
+.res-edit-box{width:min(560px,94vw);height:auto;max-height:90vh}
+.res-edit-body{padding:24px;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+.res-edit-label{display:flex;flex-direction:column;gap:7px;font-size:13px;font-weight:700;color:var(--text-2)}
+.res-edit-label .input{font-weight:400}
+.res-edit-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:4px}
+@media(max-width:640px){.res-edit-box{width:100vw;max-height:100dvh;border-radius:0}.res-edit-actions .btn{flex:1}}
