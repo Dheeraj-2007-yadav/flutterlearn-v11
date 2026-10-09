@@ -189,12 +189,18 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         renderPdfPage();
       }).catch(function(){
         // CORS blocked or not a PDF — fall back to Drive's embedded viewer
-        // (still in-site, no address bar, no direct link shown)
+        // with our own toolbar overlay blocking Drive's UI buttons
         const fileId = driveFileId(url);
         const body = document.getElementById("res-pdf-body");
         if(fileId){
-          body.innerHTML = '<iframe src="https://drive.google.com/file/d/' + fileId + '/preview" style="width:100%;height:100%;border:none;background:#fff;border-radius:8px;" allow="autoplay"></iframe>';
-          body.style.padding = "20px";
+          body.innerHTML =
+            '<div class="res-drive-wrap">' +
+              '<iframe src="https://drive.google.com/file/d/' + fileId + '/preview" ' +
+                'style="width:100%;height:100%;border:none;background:#fff;" allow="autoplay"></iframe>' +
+              '<div class="res-drive-shield"></div>' +
+            '</div>';
+          body.style.padding = "0";
+          body.style.overflow = "hidden";
           document.querySelector(".res-pdf-controls").style.display = "none";
         }else{
           document.getElementById("res-pdf-loading").innerHTML = "Could not load this document.";
