@@ -53,3 +53,13 @@
 .res-modal-body{flex:1;min-height:0}
 .res-modal-body iframe{width:100%;height:100%;border:none;background:#fff}
 @media(max-width:600px){.res-card{flex-direction:column}.res-thumb{width:100%;height:160px}}
+
+/* ---- Custom PDF viewer (no Drive UI) ---- */
+.res-pdf-box{width:min(860px,94vw);height:min(860px,92vh)}
+.res-pdf-controls{display:flex;align-items:center;gap:8px;margin:0 12px}
+.res-pdf-btn{width:34px;height:34px;border-radius:10px;background:var(--bg-sunken);border:1px solid var(--line);color:var(--text);font-size:16px;cursor:pointer;display:grid;place-items:center;font-weight:700}
+.res-pdf-btn:hover{background:var(--line)}
+.res-pdf-pagenum{font-size:13.5px;font-weight:600;color:var(--text-2);white-space:nowrap;min-width:64px;text-align:center}
+.res-pdf-body{overflow:auto;display:flex;flex-direction:column;align-items:center;padding:20px;background:var(--bg-sunken)}
+.res-pdf-body canvas{max-width:100%;height:auto;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.18);background:#fff}
+.res-pdf-loading{padding:60px 20px;color:var(--text-2);font-size:14px}
