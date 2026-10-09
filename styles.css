@@ -24,23 +24,28 @@
 .res-toggle input{width:18px;height:18px;accent-color:var(--primary)}
 .res-status{font-size:13.5px;min-height:20px;color:var(--text-2)}
 
-/* ---- Resources v2: thumbnails + preview modal ---- */
-.res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px;margin-top:16px}
-.res-card{display:flex;gap:16px;align-items:flex-start;padding:18px;transition:transform .2s var(--ease),box-shadow .2s}
-.res-card:hover{transform:translateY(-2px);box-shadow:var(--card-shadow-hover)}
-.res-thumb{width:96px;height:96px;flex:none;border-radius:12px;overflow:hidden;background:var(--bg-sunken);display:grid;place-items:center;border:1px solid var(--line)}
-.res-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.res-thumb-icon{color:var(--primary);background:var(--accent-soft);border:none}
-.res-thumb-icon svg{width:32px;height:32px}
+/* ---- Resources: professional card design ---- */
+.res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;margin-top:20px}
+.res-card{display:flex;gap:18px;align-items:stretch;padding:20px;border-radius:20px;transition:transform .25s var(--ease),box-shadow .25s,border-color .25s;position:relative;overflow:hidden}
+.res-card:hover{transform:translateY(-3px);box-shadow:var(--card-shadow-hover);border-color:var(--accent)}
+.res-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--accent));opacity:0;transition:opacity .25s}
+.res-card:hover::before{opacity:1}
+.res-thumb{width:148px;min-height:148px;flex:none;border-radius:14px;overflow:hidden;background:var(--bg-sunken);display:grid;place-items:center;border:1px solid var(--line);position:relative}
+.res-thumb img{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0}
+.res-thumb-icon{color:var(--primary);background:linear-gradient(135deg,var(--accent-soft),var(--bg-sunken));border:1px solid var(--line)}
+.res-thumb-icon svg{width:40px;height:40px;opacity:.7}
 [data-theme=dark] .res-thumb-icon{color:var(--accent)}
-.res-body{flex:1;min-width:0;display:flex;flex-direction:column}
-.res-title-row{display:flex;align-items:flex-start;gap:10px;justify-content:space-between;margin-bottom:6px}
-.res-title-row h3{font-size:16.5px;margin:0;line-height:1.35;flex:1}
-.res-desc{font-size:13.5px;margin:0 0 12px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.res-foot{display:flex;align-items:center;gap:12px;margin-top:auto;flex-wrap:wrap}
-.res-price{font-weight:800;font-size:17px;color:var(--primary)}
+.res-body{flex:1;min-width:0;display:flex;flex-direction:column;padding:4px 0}
+.res-title-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:8px}
+.res-title-row h3{font-size:18px;margin:0;line-height:1.4;flex:1;font-weight:700;letter-spacing:-.01em}
+.res-desc{font-size:14px;margin:0 0 14px;line-height:1.6;color:var(--text-2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.res-foot{display:flex;align-items:center;gap:12px;margin-top:auto;padding-top:4px}
+.res-price{font-weight:800;font-size:18px;color:var(--primary);letter-spacing:-.01em}
 [data-theme=dark] .res-price{color:var(--accent)}
-.res-btn{padding:9px 20px;font-size:14px}
+.res-btn{padding:10px 24px;font-size:14px;font-weight:700;border-radius:999px;transition:transform .2s var(--ease)}
+.res-btn:hover{transform:translateY(-1px)}
+.res-btn:active{transform:translateY(0) scale(.98)}
+.pill{font-size:11.5px;padding:4px 13px;letter-spacing:.02em;text-transform:uppercase}
 /* Preview modal */
 .res-modal{position:fixed;inset:0;z-index:200;display:none}
 .res-modal.open{display:block}
@@ -69,3 +74,15 @@
 .res-drive-wrap iframe{position:absolute;inset:0}
 .res-drive-shield{position:absolute;top:0;left:0;right:0;height:64px;z-index:5;cursor:default}
 /* The shield covers Drive's top toolbar (which has the Drive icon / open-in-drive button) */
+
+/* Resources mobile refinement */
+@media(max-width:600px){
+  .res-grid{grid-template-columns:1fr;gap:16px}
+  .res-card{flex-direction:row;gap:14px;padding:16px}
+  .res-thumb{width:110px;min-height:110px}
+  .res-title-row h3{font-size:16px}
+}
+@media(max-width:400px){
+  .res-card{flex-direction:column}
+  .res-thumb{width:100%;min-height:0;height:180px}
+}
