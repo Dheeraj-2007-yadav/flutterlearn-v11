@@ -249,16 +249,29 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
     return `
     <div class="wrap">
       <div class="page-head">
-        <h1>Resources</h1>
-        <p class="page-sub">Curated materials to boost your Flutter learning.</p>
+        <div class="res-crumb"><a href="#/home">Home</a> / <span>Resources</span></div>
+        <h1 class="res-page-title">Student Resources</h1>
+        <p class="page-sub res-page-sub">Cheat sheets, notes, and guides to accelerate your Flutter progress. Choose free downloads or premium content.</p>
+      </div>
+      <div class="card res-toolbar">
+        <div class="res-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="res-search-input" placeholder="Search resources..." />
+        </div>
+        <div class="res-filters">
+          <button class="res-filter active" data-filter="all">All <span id="res-count-all"></span></button>
+          <button class="res-filter" data-filter="free">Free <span id="res-count-free"></span></button>
+          <button class="res-filter" data-filter="paid">Paid <span id="res-count-paid"></span></button>
+        </div>
       </div>
       ${admin ? `
       <div class="card" id="res-admin" style="margin-bottom:20px">
         <h3 style="margin-bottom:12px">Add resource <span class="pill pill-admin">Admin</span></h3>
         <div class="res-form">
-          <input type="url" id="res-link" class="input" placeholder="File link (Google Drive share link, etc.)" />
+          <input type="url" id="res-link" class="input" placeholder="File link (Google Drive share link)" />
           <input type="text" id="res-title" class="input" placeholder="Title" />
-          <textarea id="res-desc" class="input" placeholder="Description" rows="2"></textarea>
+          <input type="text" id="res-category" class="input" placeholder="Category (e.g. Notes, Cheatsheet, Code)" />
+          <textarea id="res-desc" class="input" placeholder="Short description (1-2 lines)" rows="2"></textarea>
           <div class="res-row">
             <label class="res-toggle"><input type="checkbox" id="res-paid" /> Paid</label>
             <input type="text" id="res-price" class="input" placeholder="Price (e.g. ₹199)" style="display:none" />
@@ -285,6 +298,21 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
     if(btn){
       btn.addEventListener("click", function(){ window.__resPublish(); });
     }
+    // Search + filter wiring
+    const searchInput = document.getElementById("res-search-input");
+    if(searchInput && !searchInput.dataset.wired){
+      searchInput.dataset.wired = "1";
+      searchInput.addEventListener("input", applyResFilter);
+    }
+    document.querySelectorAll(".res-filter").forEach(function(f){
+      if(f.dataset.wired) return;
+      f.dataset.wired = "1";
+      f.addEventListener("click", function(){
+        document.querySelectorAll(".res-filter").forEach(function(x){ x.classList.remove("active"); });
+        f.classList.add("active");
+        applyResFilter();
+      });
+    });
     window.__resLoad();
   }
   // Watch for the resources page appearing
@@ -293,6 +321,19 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
       wireResourcesPage();
     }
   }).observe(document.body, { childList: true, subtree: true });
+
+  window.applyResFilter = function(){
+    const q = ((document.getElementById("res-search-input")||{}).value||"").toLowerCase().trim();
+    const active = document.querySelector(".res-filter.active");
+    const filter = active ? active.dataset.filter : "all";
+    document.querySelectorAll(".resx-card").forEach(function(card){
+      const title = (card.dataset.title||"").toLowerCase();
+      const paid = card.dataset.paid;
+      const matchQ = !q || title.includes(q);
+      const matchF = filter === "all" || (filter === "free" && paid === "free") || (filter === "paid" && paid === "paid");
+      card.classList.toggle("hidden", !(matchQ && matchF));
+    });
+  };
 
   // 4. Load and render resource list
   window.__resLoad = function(){
@@ -307,7 +348,7 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         list.innerHTML = '<div class="card"><p class="muted">No resources yet. Check back soon!</p></div>';
         return;
       }
-      let html = '<div class="resv-grid">';
+      let html = '<div class="resx-grid">';
       let idx = 0;
       window.__resData = window.__resData || {};
       snap.forEach(function(doc){
@@ -316,26 +357,40 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         const key = "res" + (idx++);
         window.__resData[key] = { title: r.title, url: r.storageUrl };
         const thumb = driveThumb(r.storageUrl);
-        const thumbHtml = thumb
-          ? `<div class="resv-thumb"><img src="${escHtml(thumb)}" alt="" loading="lazy" onerror="this.parentNode.innerHTML=window.__resFallbackIcon('${escHtml(r.type||'file')}')" /><span class="pill ${paid?"pill-paid":"pill-free"} resv-badge">${paid?"Paid":"Free"}</span></div>`
-          : `<div class="resv-thumb resv-thumb-icon">${fileIcon(r.type)}<span class="pill ${paid?"pill-paid":"pill-free"} resv-badge">${paid?"Paid":"Free"}</span></div>`;
         html += `
-        <div class="card resv-card">
-          ${thumbHtml}
-          <div class="resv-body">
-            <h3 class="resv-title">${escHtml(r.title)}</h3>
-            ${r.description ? `<p class="muted resv-desc">${escHtml(r.description)}</p>` : ``}
-            <div class="resv-foot">
-              ${paid && r.price ? `<span class="resv-price">${escHtml(r.price)}</span>` : `<span></span>`}
-              ${paid
-                ? `<button class="btn resv-btn" data-paid-note>Contact admin</button>`
-                : `<button class="btn btn-blue resv-btn" onclick="window.__resPreview(window.__resData['${key}'].title, window.__resData['${key}'].url)">View resource</button>`}
-            </div>
+        <div class="card resx-card" data-title="${escHtml((r.title||"").toLowerCase())}" data-paid="${paid?"paid":"free"}">
+          <div class="resx-top">
+            <span class="resx-cat">${escHtml(r.category||"Resource")}</span>
+            ${paid
+              ? `<span class="resx-price-pill">${escHtml(r.price||"Paid")}</span>`
+              : `<span class="resx-free-pill">Free</span>`}
+          </div>
+          <div class="resx-head">
+            <div class="resx-icon">${fileIcon(r.type)}</div>
+            <h3 class="resx-title">${escHtml(r.title)}</h3>
+          </div>
+          ${r.description ? `<p class="resx-desc">${escHtml(r.description)}</p>` : ``}
+          <div class="resx-foot">
+            <span class="resx-meta">${escHtml((r.type||"PDF").toUpperCase())}</span>
+            ${paid
+              ? `<button class="resx-btn resx-btn-paid" data-paid-note><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>${escHtml(r.price||"Paid")}</button>`
+              : `<button class="resx-btn resx-btn-free" onclick="window.__resPreview(window.__resData['${key}'].title, window.__resData['${key}'].url)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>View</button>`}
           </div>
         </div>`;
       });
       html += '</div>';
       list.innerHTML = html;
+      // Update filter counts
+      let nAll = 0, nFree = 0, nPaid = 0;
+      snap.forEach(function(doc){
+        nAll++;
+        if(doc.data().freeOrPaid === "paid") nPaid++; else nFree++;
+      });
+      const setCount = function(id, n){ const el = document.getElementById(id); if(el) el.textContent = "(" + n + ")"; };
+      setCount("res-count-all", nAll);
+      setCount("res-count-free", nFree);
+      setCount("res-count-paid", nPaid);
+      if(window.applyResFilter) window.applyResFilter();
       list.querySelectorAll("[data-paid-note]").forEach(function(b){
         b.addEventListener("click", function(){
           alert("This is a paid resource. Please contact the admin to purchase access.");
@@ -355,6 +410,8 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
     const link = (document.getElementById("res-link").value||"").trim();
     const title = (document.getElementById("res-title").value||"").trim();
     const desc = (document.getElementById("res-desc").value||"").trim();
+    const catEl = document.getElementById("res-category");
+    const catVal = catEl ? (catEl.value||"").trim() || "Resource" : "Resource";
     const paid = document.getElementById("res-paid").checked;
     const price = (document.getElementById("res-price").value||"").trim();
     if(!link){ say("Paste the file link first."); return; }
@@ -371,6 +428,7 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
       title: title,
       description: desc,
       type: type,
+      category: catVal,
       freeOrPaid: paid ? "paid" : "free",
       price: paid ? price : "",
       storageUrl: link,
@@ -380,6 +438,7 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
       document.getElementById("res-link").value = "";
       document.getElementById("res-title").value = "";
       document.getElementById("res-desc").value = "";
+      const rc = document.getElementById("res-category"); if(rc) rc.value = "";
       document.getElementById("res-price").value = "";
       document.getElementById("res-paid").checked = false;
       document.getElementById("res-price").style.display = "none";
