@@ -118,15 +118,31 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         </div>
       </div>` : ``}
       <div id="res-list"><div class="card"><p class="muted">Loading resources…</p></div></div>
-    </div>
-    <script>(function(){
-      var paid=document.getElementById('res-paid'), price=document.getElementById('res-price');
-      if(paid) paid.addEventListener('change',function(){ price.style.display = paid.checked ? '' : 'none'; });
-      var btn=document.getElementById('res-publish');
-      if(btn) btn.addEventListener('click', window.__resPublish);
-      window.__resLoad();
-    })();<\/script>`;
+    </div>`;
   };
+
+  // Setup wiring after view renders (inline <script> doesn't run via innerHTML)
+  function wireResourcesPage(){
+    const list = document.getElementById("res-list");
+    if(!list || list.dataset.wired) return;
+    list.dataset.wired = "1";
+    const paid = document.getElementById("res-paid");
+    const price = document.getElementById("res-price");
+    if(paid && price){
+      paid.addEventListener("change", function(){ price.style.display = paid.checked ? "" : "none"; });
+    }
+    const btn = document.getElementById("res-publish");
+    if(btn){
+      btn.addEventListener("click", function(){ window.__resPublish(); });
+    }
+    window.__resLoad();
+  }
+  // Watch for the resources page appearing
+  new MutationObserver(function(){
+    if((location.hash||"").startsWith("#/resources")){
+      wireResourcesPage();
+    }
+  }).observe(document.body, { childList: true, subtree: true });
 
   // 4. Load and render resource list
   window.__resLoad = function(){
