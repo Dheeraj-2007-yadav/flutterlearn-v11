@@ -6,7 +6,10 @@
 const ADMIN_EMAIL = "dy78dy77@gmail.com";
 
 (function(){
-  if(!window.TABS || !window.views) return;
+  // TABS and views are const globals (not on window) — access via global scope
+  try{
+    if(typeof TABS === "undefined" || typeof views === "undefined") return;
+  }catch(e){ return; }
 
   // 1. Add nav tab (desktop topbar + mobile sidebar pick this up automatically)
   TABS.push({
