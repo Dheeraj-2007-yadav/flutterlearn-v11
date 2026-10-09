@@ -396,6 +396,26 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
     });
   };
 
+
+  window.__resToggleDesc = function(key){
+    const desc = document.getElementById("resb-desc-" + key);
+    const btn = document.getElementById("resb-rm-" + key);
+    if(!desc || !btn) return;
+    const expanded = desc.classList.toggle("expanded");
+    btn.textContent = expanded ? "Show less" : "Read more";
+  };
+
+  // Check which descriptions need "Read more" (after render)
+  window.__resCheckDesc = function(){
+    document.querySelectorAll(".resb-desc").forEach(function(el){
+      const key = el.id.replace("resb-desc-", "");
+      const btn = document.getElementById("resb-rm-" + key);
+      if(btn && el.scrollHeight > el.clientHeight + 4){
+        btn.style.display = "";
+      }
+    });
+  };
+
   // Setup wiring after view renders (inline <script> doesn't run via innerHTML)
   function wireResourcesPage(){
     const list = document.getElementById("res-list");
@@ -475,7 +495,7 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         <div class="card resb-card" data-title="${escHtml((r.title||"").toLowerCase())}" data-paid="${paid?"paid":"free"}">
           <div class="resb-kicker"><span>${escHtml(r.category||"Resource")} &nbsp;·&nbsp; ${paid ? `<span class="resb-paid-text">${escHtml(r.price||"Paid")}</span>` : `<span class="resb-free-text">Free</span>`}</span><button class="resb-edit-btn" data-admin-only style="display:none" onclick="window.__resEdit('${key}')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button></div>
           <h3 class="resb-title">${escHtml(r.title)}</h3>
-          ${r.description ? `<p class="resb-desc">${escHtml(r.description)}</p>` : ``}
+          ${r.description ? `<p class="resb-desc" id="resb-desc-${key}">${escHtml(r.description)}</p><button class="resb-readmore" id="resb-rm-${key}" style="display:none" onclick="window.__resToggleDesc('${key}')">Read more</button>` : ``}
           <div class="resb-foot">
             <span class="resb-meta">${escHtml((r.fileType||(r.type==="link"?"PDF":r.type)||"PDF").toUpperCase())}</span>
             ${paid
@@ -501,6 +521,7 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
       setCount("res-count-free", nFree);
       setCount("res-count-paid", nPaid);
       if(window.applyResFilter) window.applyResFilter();
+      setTimeout(function(){ if(window.__resCheckDesc) window.__resCheckDesc(); }, 100);
       list.querySelectorAll("[data-paid-note]").forEach(function(b){
         b.addEventListener("click", function(){
           alert("This is a paid resource. Please contact the admin to purchase access.");
