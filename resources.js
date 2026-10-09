@@ -333,7 +333,7 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
     const q = ((document.getElementById("res-search-input")||{}).value||"").toLowerCase().trim();
     const active = document.querySelector(".res-filter.active");
     const filter = active ? active.dataset.filter : "all";
-    document.querySelectorAll(".resx-card").forEach(function(card){
+    document.querySelectorAll(".resb-card").forEach(function(card){
       const title = (card.dataset.title||"").toLowerCase();
       const paid = card.dataset.paid;
       const matchQ = !q || title.includes(q);
@@ -355,7 +355,7 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         list.innerHTML = '<div class="card"><p class="muted">No resources yet. Check back soon!</p></div>';
         return;
       }
-      let html = '<div class="resx-grid">';
+      let html = '<div class="resb-grid">';
       let idx = 0;
       window.__resData = window.__resData || {};
       snap.forEach(function(doc){
@@ -365,23 +365,15 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         window.__resData[key] = { title: r.title, url: r.storageUrl };
         const thumb = driveThumb(r.storageUrl);
         html += `
-        <div class="card resx-card" data-title="${escHtml((r.title||"").toLowerCase())}" data-paid="${paid?"paid":"free"}">
-          <div class="resx-top">
-            <span class="resx-cat">${escHtml(r.category||"Resource")}</span>
+        <div class="card resb-card" data-title="${escHtml((r.title||"").toLowerCase())}" data-paid="${paid?"paid":"free"}">
+          <div class="resb-kicker">${escHtml(r.category||"Resource")} &nbsp;·&nbsp; ${paid ? `<span class="resb-paid-text">${escHtml(r.price||"Paid")}</span>` : `<span class="resb-free-text">Free</span>`}</div>
+          <h3 class="resb-title">${escHtml(r.title)}</h3>
+          ${r.description ? `<p class="resb-desc">${escHtml(r.description)}</p>` : ``}
+          <div class="resb-foot">
+            <span class="resb-meta">${escHtml((r.fileType||r.type||"PDF").toUpperCase())}</span>
             ${paid
-              ? `<span class="resx-price-pill">${escHtml(r.price||"Paid")}</span>`
-              : `<span class="resx-free-pill">Free</span>`}
-          </div>
-          <div class="resx-head">
-            <div class="resx-icon">${fileIcon(r.type)}</div>
-            <h3 class="resx-title">${escHtml(r.title)}</h3>
-          </div>
-          ${r.description ? `<p class="resx-desc">${escHtml(r.description)}</p>` : ``}
-          <div class="resx-foot">
-            <span class="resx-meta">${escHtml((r.fileType||r.type||"PDF").toUpperCase())}</span>
-            ${paid
-              ? `<button class="resx-btn resx-btn-paid" data-paid-note><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>${escHtml(r.price||"Paid")}</button>`
-              : `<button class="resx-btn resx-btn-free" onclick="window.__resPreview(window.__resData['${key}'].title, window.__resData['${key}'].url)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>View</button>`}
+              ? `<button class="btn resb-btn-paid" data-paid-note>Get access &rarr;</button>`
+              : `<button class="btn btn-blue resb-btn" onclick="window.__resPreview(window.__resData['${key}'].title, window.__resData['${key}'].url)">View resource &rarr;</button>`}
           </div>
         </div>`;
       });
