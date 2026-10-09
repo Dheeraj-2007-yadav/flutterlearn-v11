@@ -93,6 +93,17 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
 
   function escHtml(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 
+  // Format price with ₹ (default currency)
+  function fmtPrice(p){
+    if(!p) return "";
+    const s = String(p).trim();
+    // Already has currency symbol?
+    if(/^[₹$€£]/.test(s) || /^(INR|USD|Rs\.?)/i.test(s)) return s;
+    // Bare number -> add ₹
+    if(/^[\d,.]+$/.test(s)) return "\u20B9" + s;
+    return s;
+  }
+
   function fileIcon(type){
     const t = String(type||"").toLowerCase();
     if(t.includes("pdf")) return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>';
@@ -256,11 +267,10 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
     return `
     <div class="wrap">
       <div class="page-head">
-        <div class="res-crumb"><a href="#/home">Home</a> / <span>Resources</span></div>
         <h1 class="res-page-title">Student Resources</h1>
         <p class="page-sub res-page-sub">Cheat sheets, notes, and guides to accelerate your Flutter progress. Choose free downloads or premium content.</p>
       </div>
-      <div class="card res-toolbar">
+      <div class="res-toolbar">
         <div class="res-search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
           <input type="text" id="res-search-input" placeholder="Search resources..." />
@@ -493,13 +503,13 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         const thumb = driveThumb(r.storageUrl);
         html += `
         <div class="card resb-card" data-title="${escHtml((r.title||"").toLowerCase())}" data-paid="${paid?"paid":"free"}">
-          <div class="resb-kicker"><span>${escHtml(r.category||"Resource")} &nbsp;·&nbsp; ${paid ? `<span class="resb-paid-text">${escHtml(r.price||"Paid")}</span>` : `<span class="resb-free-text">Free</span>`}</span><button class="resb-edit-btn" data-admin-only style="display:none" onclick="window.__resEdit('${key}')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button></div>
+          <div class="resb-kicker"><span>${escHtml(r.category||"Resource")} &nbsp;·&nbsp; ${paid ? `<span class="resb-paid-text">${escHtml(fmtPrice(r.price)||"Paid")}</span>` : `<span class="resb-free-text">Free</span>`}</span><button class="resb-edit-btn" data-admin-only style="display:none" onclick="window.__resEdit('${key}')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button></div>
           <h3 class="resb-title">${escHtml(r.title)}</h3>
           ${r.description ? `<p class="resb-desc" id="resb-desc-${key}">${escHtml(r.description)}</p><button class="resb-readmore" id="resb-rm-${key}" style="display:none" onclick="window.__resToggleDesc('${key}')">Read more</button>` : ``}
           <div class="resb-foot">
             <span class="resb-meta">${escHtml((r.fileType||(r.type==="link"?"PDF":r.type)||"PDF").toUpperCase())}</span>
             ${paid
-              ? `<button class="btn resb-btn-paid" data-paid-note>Get access &rarr;</button>`
+              ? `<button class="btn resb-btn-paid" data-paid-note>${escHtml(fmtPrice(r.price))} &middot; Get access &rarr;</button>`
               : `<button class="btn btn-blue resb-btn" onclick="window.__resPreview(window.__resData['${key}'].title, window.__resData['${key}'].url)">View resource &rarr;</button>`}
           </div>
         </div>`;
