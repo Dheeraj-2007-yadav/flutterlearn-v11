@@ -42,9 +42,9 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
       a.innerHTML = '<span class="ico">' + RES_TAB.icon + '</span><span>Resources</span>';
       a.addEventListener("click", function(){
         var sb = document.getElementById("sidebar");
-        var veil = document.querySelector(".side-veil");
-        if(sb) sb.classList.remove("open");
-        if(veil) veil.classList.remove("open");
+        var veil = document.getElementById("side-veil");
+        if(sb){ sb.classList.remove("open"); sb.setAttribute("aria-hidden","true"); }
+        if(veil) veil.classList.remove("show");
         document.body.classList.remove("side-open");
       });
       nav.appendChild(a);
