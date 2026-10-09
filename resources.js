@@ -172,8 +172,18 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
       document.getElementById("res-pdf-zout").addEventListener("click", function(){ pdfScale = Math.max(0.6, pdfScale - 0.25); renderPdfPage(); });
     }
     document.getElementById("res-modal-title").textContent = title;
-    document.getElementById("res-pdf-loading").style.display = "";
-    document.getElementById("res-pdf-canvas").style.display = "none";
+    // Restore original body content (fallback may have replaced it)
+    const body = document.getElementById("res-pdf-body");
+    if(!document.getElementById("res-pdf-canvas")){
+      body.style.padding = "";
+      body.style.overflow = "";
+      body.innerHTML = '<div class="res-pdf-loading" id="res-pdf-loading">Loading document&hellip;</div><canvas id="res-pdf-canvas"></canvas>';
+      const ctrls = document.querySelector(".res-pdf-controls");
+      if(ctrls) ctrls.style.display = "";
+    }else{
+      document.getElementById("res-pdf-loading").style.display = "";
+      document.getElementById("res-pdf-canvas").style.display = "none";
+    }
     modal.classList.add("open");
     document.body.style.overflow = "hidden";
     pdfDoc = null; pdfPage = 1; pdfScale = 1.3;
