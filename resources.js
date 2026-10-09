@@ -11,13 +11,56 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
     if(typeof TABS === "undefined" || typeof views === "undefined") return;
   }catch(e){ return; }
 
-  // 1. Add nav tab (desktop topbar + mobile sidebar pick this up automatically)
-  TABS.push({
+  // 1. Add nav tab
+  const RES_TAB = {
     route: "#/resources",
     label: "Resources",
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>',
     match: ["resources"]
-  });
+  };
+  TABS.push(RES_TAB);
+
+  // 1b. Inject into already-rendered nav (desktop topbar + mobile sidebar)
+  function injectNav(){
+    // Desktop topbar
+    document.querySelectorAll(".nav-links").forEach(function(nav){
+      if(nav.querySelector('[href="#/resources"]')) return;
+      const a = document.createElement("a");
+      a.className = "nav-link";
+      a.dataset.match = "resources";
+      a.href = "#/resources";
+      a.textContent = "Resources";
+      nav.appendChild(a);
+    });
+    // Mobile sidebar
+    document.querySelectorAll(".sidebar .side-links, #sidebar .side-nav").forEach(function(nav){
+      if(nav.querySelector('[href="#/resources"]')) return;
+      const a = document.createElement("a");
+      a.className = "side-link";
+      a.dataset.match = "resources";
+      a.href = "#/resources";
+      a.innerHTML = '<span class="side-ic">' + RES_TAB.icon + '</span><span>Resources</span>';
+      nav.appendChild(a);
+    });
+    // Fallback: any sidebar link container
+    const sideBar = document.getElementById("sidebar");
+    if(sideBar && !sideBar.querySelector('[href="#/resources"]')){
+      const links = sideBar.querySelectorAll("nav, .side-links");
+      links.forEach(function(nav){
+        const a = document.createElement("a");
+        a.className = "side-link";
+        a.dataset.match = "resources";
+        a.href = "#/resources";
+        a.innerHTML = '<span class="side-ic">' + RES_TAB.icon + '</span><span>Resources</span>';
+        nav.appendChild(a);
+      });
+    }
+  }
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", function(){ setTimeout(injectNav, 100); });
+  }else{
+    setTimeout(injectNav, 100);
+  }
 
   // 2. Firestore handle (initialized lazily)
   let db = null, firestoreReady = false;
