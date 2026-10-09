@@ -57,7 +57,7 @@
 .res-modal-close:hover{background:var(--line)}
 .res-modal-body{flex:1;min-height:0}
 .res-modal-body iframe{width:100%;height:100%;border:none;background:#fff}
-@media(max-width:600px){.res-card{flex-direction:column}.res-thumb{width:100%;height:160px}}
+
 
 /* ---- Custom PDF viewer (no Drive UI) ---- */
 .res-pdf-box{width:min(860px,94vw);height:min(860px,92vh)}
@@ -82,7 +82,32 @@
   .res-thumb{width:110px;min-height:110px}
   .res-title-row h3{font-size:16px}
 }
-@media(max-width:400px){
-  .res-card{flex-direction:column}
-  .res-thumb{width:100%;min-height:0;height:180px}
+
+
+/* ---- Resources mobile: clean single-column cards, usable viewer ---- */
+@media(max-width:640px){
+  .res-grid{grid-template-columns:1fr;gap:14px;margin-top:14px}
+  .res-card{flex-direction:column;gap:0;padding:0;overflow:hidden}
+  .res-card::before{display:none}
+  .res-thumb{width:100%;min-height:0;height:190px;border-radius:0;border:none;border-bottom:1px solid var(--line)}
+  .res-thumb img{position:relative}
+  .res-body{padding:16px 18px 18px}
+  .res-title-row h3{font-size:17px}
+  .res-foot{margin-top:10px}
+  .res-btn{flex:1;text-align:center;padding:12px 20px}
+  /* Modal: full-screen on mobile */
+  .res-modal-box{width:100vw;height:100dvh;max-height:100dvh;top:0;left:0;transform:none;border-radius:0;border:none}
+  .res-modal-head{padding:12px 14px;gap:8px;flex-wrap:wrap}
+  .res-modal-head h3{font-size:15px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .res-pdf-controls{order:3;width:100%;justify-content:center;margin:8px 0 0;padding-top:8px;border-top:1px solid var(--line)}
+  .res-pdf-btn{width:40px;height:40px}
+  .res-modal-close{width:34px;height:34px;flex:none}
+  .res-pdf-body{padding:12px}
+  .res-drive-wrap{min-height:400px}
+  /* Admin form */
+  .res-form .input{font-size:16px} /* prevents iOS zoom */
+}
+@media(max-width:380px){
+  .res-thumb{height:160px}
+  .res-body{padding:14px 14px 16px}
 }
