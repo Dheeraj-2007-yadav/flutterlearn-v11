@@ -307,7 +307,7 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         list.innerHTML = '<div class="card"><p class="muted">No resources yet. Check back soon!</p></div>';
         return;
       }
-      let html = '<div class="res-grid">';
+      let html = '<div class="resv-grid">';
       let idx = 0;
       window.__resData = window.__resData || {};
       snap.forEach(function(doc){
@@ -317,22 +317,19 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         window.__resData[key] = { title: r.title, url: r.storageUrl };
         const thumb = driveThumb(r.storageUrl);
         const thumbHtml = thumb
-          ? `<div class="res-thumb"><img src="${escHtml(thumb)}" alt="" loading="lazy" onerror="this.parentNode.innerHTML=window.__resFallbackIcon('${escHtml(r.type||'file')}')" /></div>`
-          : `<div class="res-thumb res-thumb-icon">${fileIcon(r.type)}</div>`;
+          ? `<div class="resv-thumb"><img src="${escHtml(thumb)}" alt="" loading="lazy" onerror="this.parentNode.innerHTML=window.__resFallbackIcon('${escHtml(r.type||'file')}')" /><span class="pill ${paid?"pill-paid":"pill-free"} resv-badge">${paid?"Paid":"Free"}</span></div>`
+          : `<div class="resv-thumb resv-thumb-icon">${fileIcon(r.type)}<span class="pill ${paid?"pill-paid":"pill-free"} resv-badge">${paid?"Paid":"Free"}</span></div>`;
         html += `
-        <div class="card res-card">
+        <div class="card resv-card">
           ${thumbHtml}
-          <div class="res-body">
-            <div class="res-title-row">
-              <h3>${escHtml(r.title)}</h3>
-              <span class="pill ${paid?"pill-paid":"pill-free"}">${paid?"Paid":"Free"}</span>
-            </div>
-            ${r.description ? `<p class="muted res-desc">${escHtml(r.description)}</p>` : ``}
-            <div class="res-foot">
-              ${paid && r.price ? `<span class="res-price">${escHtml(r.price)}</span>` : ``}
+          <div class="resv-body">
+            <h3 class="resv-title">${escHtml(r.title)}</h3>
+            ${r.description ? `<p class="muted resv-desc">${escHtml(r.description)}</p>` : ``}
+            <div class="resv-foot">
+              ${paid && r.price ? `<span class="resv-price">${escHtml(r.price)}</span>` : `<span></span>`}
               ${paid
-                ? `<button class="btn res-btn" data-paid-note>Contact admin to purchase</button>`
-                : `<button class="btn btn-blue res-btn" onclick="window.__resPreview(window.__resData['${key}'].title, window.__resData['${key}'].url)">View resource</button>`}
+                ? `<button class="btn resv-btn" data-paid-note>Contact admin</button>`
+                : `<button class="btn btn-blue resv-btn" onclick="window.__resPreview(window.__resData['${key}'].title, window.__resData['${key}'].url)">View resource</button>`}
             </div>
           </div>
         </div>`;
