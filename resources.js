@@ -466,17 +466,11 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         const thumb = driveThumb(r.storageUrl);
         html += `
         <div class="card resb-card" data-title="${escHtml((r.title||"").toLowerCase())}" data-paid="${paid?"paid":"free"}">
-          <div class="resb-kicker">${escHtml(r.category||"Resource")} &nbsp;·&nbsp; ${paid ? `<span class="resb-paid-text">${escHtml(r.price||"Paid")}</span>` : `<span class="resb-free-text">Free</span>`}</div>
+          <div class="resb-kicker"><span>${escHtml(r.category||"Resource")} &nbsp;·&nbsp; ${paid ? `<span class="resb-paid-text">${escHtml(r.price||"Paid")}</span>` : `<span class="resb-free-text">Free</span>`}</span><button class="resb-edit-btn" data-admin-only style="display:none" onclick="window.__resEdit('${key}')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button></div>
           <h3 class="resb-title">${escHtml(r.title)}</h3>
           ${r.description ? `<p class="resb-desc">${escHtml(r.description)}</p>` : ``}
-          <div class="resb-edit-row" data-admin-only style="display:none">
-            <button class="resb-edit-btn" onclick="window.__resEdit('${key}')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
-              Edit
-            </button>
-          </div>
           <div class="resb-foot">
-            <span class="resb-meta">${escHtml((r.fileType||r.type||"PDF").toUpperCase())}</span>
+            <span class="resb-meta">${escHtml((r.fileType||(r.type==="link"?"PDF":r.type)||"PDF").toUpperCase())}</span>
             ${paid
               ? `<button class="btn resb-btn-paid" data-paid-note>Get access &rarr;</button>`
               : `<button class="btn btn-blue resb-btn" onclick="window.__resPreview(window.__resData['${key}'].title, window.__resData['${key}'].url)">View resource &rarr;</button>`}
