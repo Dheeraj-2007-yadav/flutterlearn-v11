@@ -212,6 +212,6 @@
 @media(max-width:640px){.res-edit-box{width:100vw;max-height:100dvh;border-radius:0}.res-edit-actions .btn{flex:1}}
 
 .resb-desc.expanded{-webkit-line-clamp:unset;display:block}
-.resb-readmore{background:none;border:none;color:var(--primary);font-size:13px;font-weight:700;cursor:pointer;padding:0;margin:-12px 0 16px;text-align:left;font-family:inherit}
+.resb-readmore{background:none;border:none;color:var(--primary);font-size:13px;font-weight:700;cursor:pointer;padding:0;margin:0 0 14px;text-align:left;font-family:inherit;display:block}
 [data-theme=dark] .resb-readmore{color:var(--accent)}
 .resb-readmore:hover{text-decoration:underline}
