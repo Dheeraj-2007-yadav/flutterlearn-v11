@@ -188,7 +188,17 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         document.getElementById("res-pdf-total").textContent = doc.numPages;
         renderPdfPage();
       }).catch(function(){
-        document.getElementById("res-pdf-loading").innerHTML = "Could not load this document.";
+        // CORS blocked or not a PDF — fall back to Drive's embedded viewer
+        // (still in-site, no address bar, no direct link shown)
+        const fileId = driveFileId(url);
+        const body = document.getElementById("res-pdf-body");
+        if(fileId){
+          body.innerHTML = '<iframe src="https://drive.google.com/file/d/' + fileId + '/preview" style="width:100%;height:100%;border:none;background:#fff;border-radius:8px;" allow="autoplay"></iframe>';
+          body.style.padding = "20px";
+          document.querySelector(".res-pdf-controls").style.display = "none";
+        }else{
+          document.getElementById("res-pdf-loading").innerHTML = "Could not load this document.";
+        }
       });
     });
   };
