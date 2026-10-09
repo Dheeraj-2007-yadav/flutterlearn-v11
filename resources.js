@@ -39,7 +39,14 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
       a.className = "side-link";
       a.dataset.match = "resources";
       a.href = "#/resources";
-      a.innerHTML = '<span class="side-ic">' + RES_TAB.icon + '</span><span>Resources</span>';
+      a.innerHTML = '<span class="ico">' + RES_TAB.icon + '</span><span>Resources</span>';
+      a.addEventListener("click", function(){
+        var sb = document.getElementById("sidebar");
+        var veil = document.querySelector(".side-veil");
+        if(sb) sb.classList.remove("open");
+        if(veil) veil.classList.remove("open");
+        document.body.classList.remove("side-open");
+      });
       nav.appendChild(a);
     });
     // Fallback: any sidebar link container
@@ -51,7 +58,7 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         a.className = "side-link";
         a.dataset.match = "resources";
         a.href = "#/resources";
-        a.innerHTML = '<span class="side-ic">' + RES_TAB.icon + '</span><span>Resources</span>';
+        a.innerHTML = '<span class="ico">' + RES_TAB.icon + '</span><span>Resources</span>';
         nav.appendChild(a);
       });
     }
