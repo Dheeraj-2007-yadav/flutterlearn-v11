@@ -93,6 +93,62 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>';
   }
 
+  // Extract Google Drive file ID from share links
+  function driveFileId(url){
+    try{
+      const m = String(url||"").match(/\/d\/([a-zA-Z0-9_-]+)/) || String(url||"").match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      return m ? m[1] : null;
+    }catch(e){ return null; }
+  }
+
+  // Drive thumbnail URL (400px wide)
+  function driveThumb(url){
+    const id = driveFileId(url);
+    return id ? "https://drive.google.com/thumbnail?id=" + id + "&sz=w400" : null;
+  }
+
+  // Drive embedded preview URL (opens inside our site)
+  function drivePreview(url){
+    const id = driveFileId(url);
+    return id ? "https://drive.google.com/file/d/" + id + "/preview" : url;
+  }
+
+  window.__resFallbackIcon = function(type){ return fileIcon(type); };
+
+  // Open resource in an in-site modal instead of navigating to Drive
+  window.__resPreview = function(title, url){
+    const previewUrl = drivePreview(url);
+    let modal = document.getElementById("res-preview-modal");
+    if(!modal){
+      modal = document.createElement("div");
+      modal.id = "res-preview-modal";
+      modal.className = "res-modal";
+      modal.innerHTML =
+        '<div class="res-modal-backdrop" id="res-modal-backdrop"></div>' +
+        '<div class="res-modal-box">' +
+          '<div class="res-modal-head"><h3 id="res-modal-title"></h3>' +
+          '<button class="res-modal-close" id="res-modal-close" aria-label="Close">&times;</button></div>' +
+          '<div class="res-modal-body"><iframe id="res-modal-frame" frameborder="0" allowfullscreen></iframe></div>' +
+        '</div>';
+      document.body.appendChild(modal);
+      document.getElementById("res-modal-close").addEventListener("click", closeResModal);
+      document.getElementById("res-modal-backdrop").addEventListener("click", closeResModal);
+      document.addEventListener("keydown", function(e){ if(e.key === "Escape") closeResModal(); });
+    }
+    document.getElementById("res-modal-title").textContent = title;
+    document.getElementById("res-modal-frame").src = previewUrl;
+    modal.classList.add("open");
+    document.body.style.overflow = "hidden";
+  };
+  function closeResModal(){
+    const modal = document.getElementById("res-preview-modal");
+    if(modal){
+      modal.classList.remove("open");
+      document.getElementById("res-modal-frame").src = "";
+    }
+    document.body.style.overflow = "";
+  }
+
   // 3. The Resources view
   views.resources = function(){
     const admin = isAdmin();
@@ -158,20 +214,32 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         return;
       }
       let html = '<div class="res-grid">';
+      let idx = 0;
+      window.__resData = window.__resData || {};
       snap.forEach(function(doc){
         const r = doc.data();
         const paid = r.freeOrPaid === "paid";
+        const key = "res" + (idx++);
+        window.__resData[key] = { title: r.title, url: r.storageUrl };
+        const thumb = driveThumb(r.storageUrl);
+        const thumbHtml = thumb
+          ? `<div class="res-thumb"><img src="${escHtml(thumb)}" alt="" loading="lazy" onerror="this.parentNode.innerHTML=window.__resFallbackIcon('${escHtml(r.type||'file')}')" /></div>`
+          : `<div class="res-thumb res-thumb-icon">${fileIcon(r.type)}</div>`;
         html += `
         <div class="card res-card">
-          <div class="res-icon">${fileIcon(r.type)}</div>
+          ${thumbHtml}
           <div class="res-body">
-            <div class="res-title-row"><h3>${escHtml(r.title)}</h3>
-              <span class="pill ${paid?"pill-paid":"pill-free"}">${paid?"Paid":"Free"}</span></div>
-            <p class="muted res-desc">${escHtml(r.description||"")}</p>
-            ${paid && r.price ? `<div class="res-price">${escHtml(r.price)}</div>` : ``}
-            ${paid
-              ? `<button class="btn" data-paid-note>Contact admin to purchase</button>`
-              : `<a class="btn btn-blue" href="${escHtml(r.storageUrl)}" target="_blank" rel="noopener" download>Download</a>`}
+            <div class="res-title-row">
+              <h3>${escHtml(r.title)}</h3>
+              <span class="pill ${paid?"pill-paid":"pill-free"}">${paid?"Paid":"Free"}</span>
+            </div>
+            ${r.description ? `<p class="muted res-desc">${escHtml(r.description)}</p>` : ``}
+            <div class="res-foot">
+              ${paid && r.price ? `<span class="res-price">${escHtml(r.price)}</span>` : ``}
+              ${paid
+                ? `<button class="btn res-btn" data-paid-note>Contact admin to purchase</button>`
+                : `<button class="btn btn-blue res-btn" onclick="window.__resPreview(window.__resData['${key}'].title, window.__resData['${key}'].url)">View resource</button>`}
+            </div>
           </div>
         </div>`;
       });
