@@ -24,41 +24,6 @@
 .res-toggle input{width:18px;height:18px;accent-color:var(--primary)}
 .res-status{font-size:13.5px;min-height:20px;color:var(--text-2)}
 
-/* ---- Resources: professional card design ---- */
-.res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;margin-top:20px}
-.res-card{display:flex;gap:18px;align-items:stretch;padding:20px;border-radius:20px;transition:transform .25s var(--ease),box-shadow .25s,border-color .25s;position:relative;overflow:hidden}
-.res-card:hover{transform:translateY(-3px);box-shadow:var(--card-shadow-hover);border-color:var(--accent)}
-.res-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--accent));opacity:0;transition:opacity .25s}
-.res-card:hover::before{opacity:1}
-.res-thumb{width:148px;min-height:148px;flex:none;border-radius:14px;overflow:hidden;background:var(--bg-sunken);display:grid;place-items:center;border:1px solid var(--line);position:relative}
-.res-thumb img{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0}
-.res-thumb-icon{color:var(--primary);background:linear-gradient(135deg,var(--accent-soft),var(--bg-sunken));border:1px solid var(--line)}
-.res-thumb-icon svg{width:40px;height:40px;opacity:.7}
-[data-theme=dark] .res-thumb-icon{color:var(--accent)}
-.res-body{flex:1;min-width:0;display:flex;flex-direction:column;padding:4px 0}
-.res-title-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:8px}
-.res-title-row h3{font-size:18px;margin:0;line-height:1.4;flex:1;font-weight:700;letter-spacing:-.01em}
-.res-desc{font-size:14px;margin:0 0 14px;line-height:1.6;color:var(--text-2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.res-foot{display:flex;align-items:center;gap:12px;margin-top:auto;padding-top:4px}
-.res-price{font-weight:800;font-size:18px;color:var(--primary);letter-spacing:-.01em}
-[data-theme=dark] .res-price{color:var(--accent)}
-.res-btn{padding:10px 24px;font-size:14px;font-weight:700;border-radius:999px;transition:transform .2s var(--ease)}
-.res-btn:hover{transform:translateY(-1px)}
-.res-btn:active{transform:translateY(0) scale(.98)}
-.pill{font-size:11.5px;padding:4px 13px;letter-spacing:.02em;text-transform:uppercase}
-/* Preview modal */
-.res-modal{position:fixed;inset:0;z-index:200;display:none}
-.res-modal.open{display:block}
-.res-modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
-.res-modal-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(900px,92vw);height:min(700px,88vh);background:var(--bg-elev);border-radius:18px;border:1px solid var(--line);box-shadow:0 24px 64px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden}
-.res-modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line)}
-.res-modal-head h3{margin:0;font-size:17px}
-.res-modal-close{width:36px;height:36px;border-radius:50%;background:var(--bg-sunken);border:1px solid var(--line);font-size:22px;line-height:1;color:var(--text);cursor:pointer;display:grid;place-items:center}
-.res-modal-close:hover{background:var(--line)}
-.res-modal-body{flex:1;min-height:0}
-.res-modal-body iframe{width:100%;height:100%;border:none;background:#fff}
-
-
 /* ---- Custom PDF viewer (no Drive UI) ---- */
 .res-pdf-box{width:min(860px,94vw);height:min(860px,92vh)}
 .res-pdf-controls{display:flex;align-items:center;gap:8px;margin:0 12px}
@@ -84,18 +49,28 @@
 }
 
 
-/* ---- Resources mobile: clean single-column cards, usable viewer ---- */
+
+/* ---- Resources: vertical product cards ---- */
+.resv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:22px;margin-top:20px}
+.resv-card{padding:0;overflow:hidden;border-radius:20px;display:flex;flex-direction:column;transition:transform .25s var(--ease),box-shadow .25s}
+.resv-card:hover{transform:translateY(-4px);box-shadow:var(--card-shadow-hover)}
+.resv-thumb{position:relative;width:100%;aspect-ratio:16/10;background:var(--bg-sunken);overflow:hidden;border-bottom:1px solid var(--line)}
+.resv-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.resv-thumb-icon{display:grid;place-items:center;color:var(--primary);background:linear-gradient(135deg,var(--accent-soft),var(--bg-sunken))}
+.resv-thumb-icon svg{width:48px;height:48px;opacity:.6}
+[data-theme=dark] .resv-thumb-icon{color:var(--accent)}
+.resv-badge{position:absolute;top:12px;right:12px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.resv-body{padding:18px 20px 20px;display:flex;flex-direction:column;flex:1}
+.resv-title{font-size:17px;font-weight:700;margin:0 0 8px;line-height:1.4;letter-spacing:-.01em}
+.resv-desc{font-size:13.5px;line-height:1.6;color:var(--text-2);margin:0 0 16px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1}
+.resv-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto}
+.resv-price{font-size:18px;font-weight:800;color:var(--primary);letter-spacing:-.01em}
+[data-theme=dark] .resv-price{color:var(--accent)}
+.resv-btn{padding:10px 22px;font-size:13.5px;font-weight:700;white-space:nowrap}
 @media(max-width:640px){
-  .res-grid{grid-template-columns:1fr;gap:14px;margin-top:14px}
-  .res-card{flex-direction:column;gap:0;padding:0;overflow:hidden}
-  .res-card::before{display:none}
-  .res-thumb{width:100%;min-height:0;height:190px;border-radius:0;border:none;border-bottom:1px solid var(--line)}
-  .res-thumb img{position:relative}
-  .res-body{padding:16px 18px 18px}
-  .res-title-row h3{font-size:17px}
-  .res-foot{margin-top:10px}
-  .res-btn{flex:1;text-align:center;padding:12px 20px}
-  /* Modal: full-screen on mobile */
+  .resv-grid{grid-template-columns:1fr;gap:16px}
+  .resv-thumb{aspect-ratio:16/9}
+  /* Modal full-screen */
   .res-modal-box{width:100vw;height:100dvh;max-height:100dvh;top:0;left:0;transform:none;border-radius:0;border:none}
   .res-modal-head{padding:12px 14px;gap:8px;flex-wrap:wrap}
   .res-modal-head h3{font-size:15px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -104,10 +79,5 @@
   .res-modal-close{width:34px;height:34px;flex:none}
   .res-pdf-body{padding:12px}
   .res-drive-wrap{min-height:400px}
-  /* Admin form */
-  .res-form .input{font-size:16px} /* prevents iOS zoom */
-}
-@media(max-width:380px){
-  .res-thumb{height:160px}
-  .res-body{padding:14px 14px 16px}
+  .res-form .input{font-size:16px}
 }
