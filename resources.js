@@ -115,9 +115,29 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
 
   window.__resFallbackIcon = function(type){ return fileIcon(type); };
 
-  // Open resource in an in-site modal instead of navigating to Drive
+  // Load PDF.js lazily
+  let pdfjsLoaded = false;
+  function loadPdfJs(cb){
+    if(pdfjsLoaded){ cb(); return; }
+    if(window.pdfjsLib){ pdfjsLoaded = true; cb(); return; }
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+    s.onload = function(){
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+      pdfjsLoaded = true;
+      cb();
+    };
+    s.onerror = function(){ cb(new Error("pdfjs")); };
+    document.head.appendChild(s);
+  }
+
+  // Custom PDF viewer — renders pages as canvas, no Drive UI, no download button
+  let pdfDoc = null, pdfPage = 1, pdfScale = 1.3, pdfRendering = false;
   window.__resPreview = function(title, url){
-    const previewUrl = drivePreview(url);
+    const fileId = driveFileId(url);
+    const directUrl = fileId
+      ? "https://drive.google.com/uc?export=download&id=" + fileId
+      : url;
     let modal = document.getElementById("res-preview-modal");
     if(!modal){
       modal = document.createElement("div");
@@ -125,28 +145,76 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
       modal.className = "res-modal";
       modal.innerHTML =
         '<div class="res-modal-backdrop" id="res-modal-backdrop"></div>' +
-        '<div class="res-modal-box">' +
+        '<div class="res-modal-box res-pdf-box">' +
           '<div class="res-modal-head"><h3 id="res-modal-title"></h3>' +
+          '<div class="res-pdf-controls">' +
+            '<button class="res-pdf-btn" id="res-pdf-prev" aria-label="Previous page">&larr;</button>' +
+            '<span class="res-pdf-pagenum"><span id="res-pdf-cur">1</span> / <span id="res-pdf-total">?</span></span>' +
+            '<button class="res-pdf-btn" id="res-pdf-next" aria-label="Next page">&rarr;</button>' +
+            '<button class="res-pdf-btn" id="res-pdf-zout" aria-label="Zoom out">&minus;</button>' +
+            '<button class="res-pdf-btn" id="res-pdf-zin" aria-label="Zoom in">+</button>' +
+          '</div>' +
           '<button class="res-modal-close" id="res-modal-close" aria-label="Close">&times;</button></div>' +
-          '<div class="res-modal-body"><iframe id="res-modal-frame" frameborder="0" allowfullscreen></iframe></div>' +
+          '<div class="res-modal-body res-pdf-body" id="res-pdf-body">' +
+            '<div class="res-pdf-loading" id="res-pdf-loading">Loading document&hellip;</div>' +
+            '<canvas id="res-pdf-canvas"></canvas>' +
+          '</div>' +
         '</div>';
       document.body.appendChild(modal);
       document.getElementById("res-modal-close").addEventListener("click", closeResModal);
       document.getElementById("res-modal-backdrop").addEventListener("click", closeResModal);
       document.addEventListener("keydown", function(e){ if(e.key === "Escape") closeResModal(); });
+      // Block right-click / context menu on the viewer (deters casual saving)
+      modal.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+      document.getElementById("res-pdf-prev").addEventListener("click", function(){ if(pdfDoc && pdfPage > 1){ pdfPage--; renderPdfPage(); } });
+      document.getElementById("res-pdf-next").addEventListener("click", function(){ if(pdfDoc && pdfPage < pdfDoc.numPages){ pdfPage++; renderPdfPage(); } });
+      document.getElementById("res-pdf-zin").addEventListener("click", function(){ pdfScale = Math.min(3, pdfScale + 0.25); renderPdfPage(); });
+      document.getElementById("res-pdf-zout").addEventListener("click", function(){ pdfScale = Math.max(0.6, pdfScale - 0.25); renderPdfPage(); });
     }
     document.getElementById("res-modal-title").textContent = title;
-    document.getElementById("res-modal-frame").src = previewUrl;
+    document.getElementById("res-pdf-loading").style.display = "";
+    document.getElementById("res-pdf-canvas").style.display = "none";
     modal.classList.add("open");
     document.body.style.overflow = "hidden";
+    pdfDoc = null; pdfPage = 1; pdfScale = 1.3;
+    loadPdfJs(function(err){
+      if(err || !window.pdfjsLib){
+        // Fallback: Drive embed (should rarely happen)
+        document.getElementById("res-pdf-loading").innerHTML = "Viewer failed to load. Please try again.";
+        return;
+      }
+      pdfjsLib.getDocument({ url: directUrl, withCredentials: false }).promise.then(function(doc){
+        pdfDoc = doc;
+        document.getElementById("res-pdf-total").textContent = doc.numPages;
+        renderPdfPage();
+      }).catch(function(){
+        document.getElementById("res-pdf-loading").innerHTML = "Could not load this document.";
+      });
+    });
   };
+  function renderPdfPage(){
+    if(!pdfDoc || pdfRendering) return;
+    pdfRendering = true;
+    document.getElementById("res-pdf-cur").textContent = pdfPage;
+    pdfDoc.getPage(pdfPage).then(function(page){
+      const canvas = document.getElementById("res-pdf-canvas");
+      const ctx = canvas.getContext("2d");
+      const viewport = page.getViewport({ scale: pdfScale });
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      canvas.style.display = "";
+      document.getElementById("res-pdf-loading").style.display = "none";
+      page.render({ canvasContext: ctx, viewport: viewport }).promise.then(function(){
+        pdfRendering = false;
+        document.getElementById("res-pdf-body").scrollTop = 0;
+      });
+    });
+  }
   function closeResModal(){
     const modal = document.getElementById("res-preview-modal");
-    if(modal){
-      modal.classList.remove("open");
-      document.getElementById("res-modal-frame").src = "";
-    }
+    if(modal) modal.classList.remove("open");
     document.body.style.overflow = "";
+    pdfDoc = null;
   }
 
   // 3. The Resources view
