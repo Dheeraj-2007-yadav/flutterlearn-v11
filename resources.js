@@ -271,6 +271,13 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
           <input type="url" id="res-link" class="input" placeholder="File link (Google Drive share link)" />
           <input type="text" id="res-title" class="input" placeholder="Title" />
           <input type="text" id="res-category" class="input" placeholder="Category (e.g. Notes, Cheatsheet, Code)" />
+          <select id="res-filetype" class="input">
+            <option value="PDF">PDF document</option>
+            <option value="ZIP">ZIP archive</option>
+            <option value="Video">Video</option>
+            <option value="Code">Source code</option>
+            <option value="Doc">Document</option>
+          </select>
           <textarea id="res-desc" class="input" placeholder="Short description (1-2 lines)" rows="2"></textarea>
           <div class="res-row">
             <label class="res-toggle"><input type="checkbox" id="res-paid" /> Paid</label>
@@ -371,7 +378,7 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
           </div>
           ${r.description ? `<p class="resx-desc">${escHtml(r.description)}</p>` : ``}
           <div class="resx-foot">
-            <span class="resx-meta">${escHtml((r.type||"PDF").toUpperCase())}</span>
+            <span class="resx-meta">${escHtml((r.fileType||r.type||"PDF").toUpperCase())}</span>
             ${paid
               ? `<button class="resx-btn resx-btn-paid" data-paid-note><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>${escHtml(r.price||"Paid")}</button>`
               : `<button class="resx-btn resx-btn-free" onclick="window.__resPreview(window.__resData['${key}'].title, window.__resData['${key}'].url)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>View</button>`}
@@ -412,6 +419,8 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
     const desc = (document.getElementById("res-desc").value||"").trim();
     const catEl = document.getElementById("res-category");
     const catVal = catEl ? (catEl.value||"").trim() || "Resource" : "Resource";
+    const ftEl = document.getElementById("res-filetype");
+    const ftVal = ftEl ? ftEl.value : "PDF";
     const paid = document.getElementById("res-paid").checked;
     const price = (document.getElementById("res-price").value||"").trim();
     if(!link){ say("Paste the file link first."); return; }
@@ -428,6 +437,7 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
       title: title,
       description: desc,
       type: type,
+      fileType: ftVal,
       category: catVal,
       freeOrPaid: paid ? "paid" : "free",
       price: paid ? price : "",
