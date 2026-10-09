@@ -141,7 +141,7 @@
 .resx-meta{font-size:12.5px;font-weight:700;color:var(--text-3);letter-spacing:.04em}
 .resx-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 26px;border-radius:999px;font-size:14px;font-weight:800;cursor:pointer;border:none;transition:transform .2s var(--ease),box-shadow .2s}
 .resx-btn svg{width:16px;height:16px}
-.resx-btn-free{background:linear-gradient(135deg,#7ba7ff,#5b8def);color:#fff;box-shadow:0 4px 14px rgba(91,141,239,.35)}
+.resx-btn-free{background:var(--accent);color:#fff;box-shadow:0 4px 14px rgba(91,141,239,.35)}
 .resx-btn-free:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(91,141,239,.45)}
 .resx-btn-paid{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;box-shadow:0 4px 14px rgba(245,158,11,.35)}
 .resx-btn-paid:hover{transform:translateY(-1px)}
