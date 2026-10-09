@@ -291,6 +291,104 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
     </div>`;
   };
 
+
+  // 5. Edit resource (admin only)
+  window.__resEdit = function(key){
+    if(!isAdmin()) return;
+    const d = (window.__resData||{})[key];
+    if(!d || !d.id) return;
+    let modal = document.getElementById("res-edit-modal");
+    if(!modal){
+      modal = document.createElement("div");
+      modal.id = "res-edit-modal";
+      modal.className = "res-modal";
+      modal.innerHTML =
+        '<div class="res-modal-backdrop" id="res-edit-backdrop"></div>' +
+        '<div class="res-modal-box res-edit-box">' +
+          '<div class="res-modal-head"><h3>Edit resource</h3>' +
+          '<button class="res-modal-close" id="res-edit-close">&times;</button></div>' +
+          '<div class="res-edit-body">' +
+            '<label class="res-edit-label">File link<input type="url" id="res-e-link" class="input" /></label>' +
+            '<label class="res-edit-label">Title<input type="text" id="res-e-title" class="input" /></label>' +
+            '<label class="res-edit-label">Category<input type="text" id="res-e-category" class="input" /></label>' +
+            '<label class="res-edit-label">File type<select id="res-e-filetype" class="input">' +
+              '<option value="PDF">PDF document</option><option value="ZIP">ZIP archive</option>' +
+              '<option value="Video">Video</option><option value="Code">Source code</option>' +
+              '<option value="Doc">Document</option></select></label>' +
+            '<label class="res-edit-label">Description<textarea id="res-e-desc" class="input" rows="2"></textarea></label>' +
+            '<label class="res-toggle"><input type="checkbox" id="res-e-paid" /> Paid</label>' +
+            '<label class="res-edit-label" id="res-e-price-wrap" style="display:none">Price<input type="text" id="res-e-price" class="input" /></label>' +
+            '<div class="res-edit-actions">' +
+              '<button class="btn" id="res-e-cancel">Cancel</button>' +
+              '<button class="btn btn-blue" id="res-e-save">Save changes</button>' +
+            '</div>' +
+            '<div id="res-e-status" class="res-status"></div>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(modal);
+      document.getElementById("res-edit-close").addEventListener("click", closeResEdit);
+      document.getElementById("res-edit-backdrop").addEventListener("click", closeResEdit);
+      document.getElementById("res-e-cancel").addEventListener("click", closeResEdit);
+      document.getElementById("res-e-paid").addEventListener("change", function(){
+        document.getElementById("res-e-price-wrap").style.display = this.checked ? "" : "none";
+      });
+      document.getElementById("res-e-save").addEventListener("click", function(){ window.__resUpdate(); });
+    }
+    // Fill form
+    document.getElementById("res-e-link").value = d.url||"";
+    document.getElementById("res-e-title").value = d.title||"";
+    document.getElementById("res-e-category").value = d.category||"";
+    document.getElementById("res-e-filetype").value = d.fileType||"PDF";
+    document.getElementById("res-e-desc").value = d.description||"";
+    document.getElementById("res-e-paid").checked = !!d.paid;
+    document.getElementById("res-e-price").value = d.price||"";
+    document.getElementById("res-e-price-wrap").style.display = d.paid ? "" : "none";
+    document.getElementById("res-e-status").textContent = "";
+    document.getElementById("res-e-status").className = "res-status";
+    modal.dataset.editKey = key;
+    modal.classList.add("open");
+    document.body.style.overflow = "hidden";
+  };
+  function closeResEdit(){
+    const m = document.getElementById("res-edit-modal");
+    if(m) m.classList.remove("open");
+    // Only restore scroll if preview modal isn't open
+    if(!document.getElementById("res-preview-modal") || !document.getElementById("res-preview-modal").classList.contains("open")){
+      document.body.style.overflow = "";
+    }
+  }
+  window.__resUpdate = function(){
+    if(!isAdmin()) return;
+    const modal = document.getElementById("res-edit-modal");
+    const key = modal ? modal.dataset.editKey : null;
+    const d = (window.__resData||{})[key||""];
+    if(!d || !d.id) return;
+    const say = function(msg, ok){
+      const el = document.getElementById("res-e-status");
+      if(el){ el.textContent = msg; el.className = "res-status" + (ok===true?" ok":ok===false?" err":""); }
+    };
+    const link = document.getElementById("res-e-link").value.trim();
+    const title = document.getElementById("res-e-title").value.trim();
+    const category = document.getElementById("res-e-category").value.trim() || "Resource";
+    const fileType = document.getElementById("res-e-filetype").value;
+    const desc = document.getElementById("res-e-desc").value.trim();
+    const paid = document.getElementById("res-e-paid").checked;
+    const price = document.getElementById("res-e-price").value.trim();
+    if(!link){ say("Paste the file link.", false); return; }
+    if(!title){ say("Add a title.", false); return; }
+    if(paid && !price){ say("Add a price.", false); return; }
+    say("Saving…");
+    db.collection("resources").doc(d.id).update({
+      title: title, description: desc, category: category, fileType: fileType,
+      freeOrPaid: paid ? "paid" : "free", price: paid ? price : "", storageUrl: link
+    }).then(function(){
+      say("Saved!", true);
+      setTimeout(function(){ closeResEdit(); window.__resLoad(); }, 800);
+    }).catch(function(e){
+      say("Could not save: " + (e && e.message ? e.message : "error"), false);
+    });
+  };
+
   // Setup wiring after view renders (inline <script> doesn't run via innerHTML)
   function wireResourcesPage(){
     const list = document.getElementById("res-list");
@@ -362,13 +460,21 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         const r = doc.data();
         const paid = r.freeOrPaid === "paid";
         const key = "res" + (idx++);
-        window.__resData[key] = { title: r.title, url: r.storageUrl };
+        window.__resData[key] = { title: r.title, url: r.storageUrl, id: doc.id,
+          category: r.category||"", description: r.description||"",
+          fileType: r.fileType||"PDF", paid: paid, price: r.price||"" };
         const thumb = driveThumb(r.storageUrl);
         html += `
         <div class="card resb-card" data-title="${escHtml((r.title||"").toLowerCase())}" data-paid="${paid?"paid":"free"}">
           <div class="resb-kicker">${escHtml(r.category||"Resource")} &nbsp;·&nbsp; ${paid ? `<span class="resb-paid-text">${escHtml(r.price||"Paid")}</span>` : `<span class="resb-free-text">Free</span>`}</div>
           <h3 class="resb-title">${escHtml(r.title)}</h3>
           ${r.description ? `<p class="resb-desc">${escHtml(r.description)}</p>` : ``}
+          <div class="resb-edit-row" data-admin-only style="display:none">
+            <button class="resb-edit-btn" onclick="window.__resEdit('${key}')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+              Edit
+            </button>
+          </div>
           <div class="resb-foot">
             <span class="resb-meta">${escHtml((r.fileType||r.type||"PDF").toUpperCase())}</span>
             ${paid
@@ -379,6 +485,10 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
       });
       html += '</div>';
       list.innerHTML = html;
+      // Show admin-only edit buttons
+      if(isAdmin()){
+        list.querySelectorAll("[data-admin-only]").forEach(function(el){ el.style.display = ""; });
+      }
       // Update filter counts
       let nAll = 0, nFree = 0, nPaid = 0;
       snap.forEach(function(doc){
