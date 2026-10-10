@@ -2,14 +2,11 @@
 function readLocalProgress(uid){if(memStore)return memStore;try{const raw=localStorage.getItem(progKey(uid));if(raw){const parsed=JSON.parse(raw);if(parsed&&typeof parsed==="object")return parsed;}}catch(_){}
 return null;}
 function writeLocalProgress(state,uid){memStore=state;try{localStorage.setItem(progKey(uid),JSON.stringify(state));}catch(_){}}
-const store={read:()=>readLocalProgress(),write(e){writeLocalProgress(e);saveProgressToFirestore();}};let firestoreSaveTimer=null;let lastCloudJson="";function activeUid(){try{return currentUser?currentUser.uid:null;}
-catch(_){return null;}}
-function authIsBroken(){try{return!!authUnavailable;}
-catch(_){return true;}}
+const store={read:()=>readLocalProgress(),write(e){writeLocalProgress(e);saveProgressToFirestore();}};let firestoreSaveTimer=null;let lastCloudJson="";function activeUid(){try{return currentUser?currentUser.uid:null;}catch(_){return null;}}
+function authIsBroken(){try{return!!authUnavailable;}catch(_){return true;}}
 function firestoreUsable(){return!!(window.firebase&&!authIsBroken()&&typeof firebase.firestore==="function");}
 function progressPayload(state){return{lessonsDone:(state&&state.lessonsDone)||{},quizzesPassed:(state&&state.quizzesPassed)||{},quizHistory:(state&&state.quizHistory)||{},last:(state&&state.last)||null};}
-function writeProgressToFirestore(uid,state){if(!uid||!firestoreUsable())return;try{let stamp=null;try{stamp=firebase.firestore.FieldValue.serverTimestamp();}
-catch(_){stamp=Date.now();}
+function writeProgressToFirestore(uid,state){if(!uid||!firestoreUsable())return;try{let stamp=null;try{stamp=firebase.firestore.FieldValue.serverTimestamp();}catch(_){stamp=Date.now();}
 firebase.firestore().collection("userProgress").doc(uid).set(Object.assign(progressPayload(state),{updatedAt:stamp}),{merge:true}).catch(err=>console.warn("[progress] cloud save failed:",err));}catch(err){console.warn("[progress] cloud save error:",err);}}
 function saveProgressToFirestore(){const uid=activeUid();if(!uid)return;clearTimeout(firestoreSaveTimer);firestoreSaveTimer=setTimeout(()=>{const json=JSON.stringify(progressPayload(S));if(json===lastCloudJson)return;lastCloudJson=json;writeProgressToFirestore(uid,S);},1500);}
 function flushProgressToFirestore(uid){clearTimeout(firestoreSaveTimer);firestoreSaveTimer=null;if(!uid)return;lastCloudJson=JSON.stringify(progressPayload(S));writeProgressToFirestore(uid,S);}
@@ -35,7 +32,8 @@ let logoutReturnFocus=null;function showLogoutConfirm(e){if(!auth||!currentUser)
 function hideLogoutConfirm(){const e=$("#logout-veil");if(!e||!e.classList.contains("show"))return;closeModalVeil(e,!1);const t=logoutReturnFocus;logoutReturnFocus=null,t&&document.contains(t)&&setTimeout(()=>t.focus(),180)}
 async function confirmLogout(){if(!auth)return;const e=$("#logout-confirm");e&&(e.disabled=!0,e.textContent="Logging out…");try{await auth.signOut(),hideLogoutConfirm()}catch(e){}finally{e&&(e.disabled=!1,e.textContent="Log out")}}
 function initFirebaseAuth(){if(!window.firebase)return authUnavailable=!0,authReady=!0,updateAuthUI(),void((location.hash||"").startsWith("#/profile")&&render());try{firebase.apps.length||firebase.initializeApp(FIREBASE_CONFIG);auth=firebase.auth();auth.onAuthStateChanged(user=>{const prevUid=currentUser?currentUser.uid:null;const nextUid=user?user.uid:null;currentUser=user||null;authReady=true;switchProgressUser(prevUid,nextUid);updateAuthUI();if((location.hash||"#/home").startsWith("#/profile"))render();},()=>{authUnavailable=true;authReady=true;updateAuthUI();if((location.hash||"").startsWith("#/profile"))render();});}catch(e){authUnavailable=!0,authReady=!0,updateAuthUI()}}
-const RANKS=DATA.ranks,QUIZ_PASS=DATA.quiz.passPercent;function doneCount(){return Object.keys(S.lessonsDone||{}).length+Object.keys(S.quizzesPassed||{}).length}
+const RANKS=DATA.ranks,QUIZ_PASS=DATA.quiz.passPercent;function doneCount(){const lessons=S.lessonsDone||{};const quizzes=S.quizzesPassed||{};let concepts=0;for(let i=1;i<=4;i++){const lessonDone=lessons[i]||lessons[String(i)];const quizDone=quizzes["quiz-"+i];if(lessonDone&&quizDone)concepts++;}
+return concepts;}
 function rankIndexFor(e){let t=0;return RANKS.forEach((n,s)=>{e>=n.need&&(t=s)}),t}
 function bumpRank(e){save();const t=rankIndexFor(doneCount());updateRankUI(),t>e&&setTimeout(()=>showRankUp(t),450),render()}
 function updateRankUI(){const e=rankIndexFor(doneCount());$$(".rank-chip").forEach(t=>{t.innerHTML=`<span class="rank-dot">${TROPHY_ICON}</span><span>${esc(RANKS[e].name)}</span>`})}
