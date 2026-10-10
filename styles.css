@@ -226,7 +226,7 @@
 ::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
 ::view-transition-old(root){z-index:1}
 ::view-transition-new(root){z-index:2147483646}
-.codeblock pre{color:#f0f6ff}
+.codeblock pre,.codeblock pre code{color:#f0f6ff!important}
 .codeblock .tok-k{color:#66d9ff;font-weight:700}
 .codeblock .tok-s{color:#ffcc44}
 .codeblock .tok-n{color:#ff9e64}
