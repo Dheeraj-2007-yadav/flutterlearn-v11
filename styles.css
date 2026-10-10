@@ -222,3 +222,7 @@
 /* Unified logout hover - solid red everywhere */
 .auth-logout:hover,.side-foot .auth-logout:hover,.profile-actions .auth-logout:hover,.logout-confirm:hover{color:#fff!important;background:#e54852!important;border-color:#e54852!important;transform:none}
 [data-theme=dark] .auth-logout:hover,[data-theme=dark] .side-foot .auth-logout:hover,[data-theme=dark] .profile-actions .auth-logout:hover,[data-theme=dark] .logout-confirm:hover{color:#fff!important;background:#e54852!important;border-color:#e54852!important;transform:none}
+/* Theme sunrise/sunset circular reveal */
+::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
+::view-transition-old(root){z-index:1}
+::view-transition-new(root){z-index:2147483646}
