@@ -215,3 +215,6 @@
 /* Resources: match site top spacing */
 .res-page-title{margin-top:0}
 .wrap > .page-head:first-child{margin-top:0}
+.auth-logout:hover{color:#fff;background:#e54852;border-color:#e54852}
+[data-theme=dark] .auth-logout:hover{color:#fff;background:#e54852;border-color:#e54852}
+.side-foot .auth-logout:hover{color:#fff;background:#e54852;border-color:#e54852}
