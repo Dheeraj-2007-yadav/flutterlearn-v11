@@ -226,9 +226,10 @@
 ::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
 ::view-transition-old(root){z-index:1}
 ::view-transition-new(root){z-index:2147483646}
-.codeblock .tok-k{color:#7dd3fc;font-weight:600}
-.codeblock .tok-s{color:#fbbf24}
-.codeblock .tok-n{color:#fb923c}
-.codeblock .tok-c{color:#64748b;font-style:italic}
-.codeblock .tok-f{color:#93c5fd}
-.codeblock .tok-a{color:#5eead4}
+.codeblock pre{color:#f0f6ff}
+.codeblock .tok-k{color:#66d9ff;font-weight:700}
+.codeblock .tok-s{color:#ffcc44}
+.codeblock .tok-n{color:#ff9e64}
+.codeblock .tok-c{color:#8a9bb0;font-style:italic}
+.codeblock .tok-f{color:#9ecbff}
+.codeblock .tok-a{color:#4fe3c1}
