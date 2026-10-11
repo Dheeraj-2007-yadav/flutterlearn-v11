@@ -342,6 +342,8 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
             '<label class="res-toggle"><input type="checkbox" id="res-e-paid" /> Paid</label>' +
             '<label class="res-edit-label" id="res-e-price-wrap" style="display:none">Price<input type="text" id="res-e-price" class="input" /></label>' +
             '<div class="res-edit-actions">' +
+              '<button class="btn res-delete-btn" id="res-e-delete">Delete</button>' +
+              '<span style="flex:1"></span>' +
               '<button class="btn" id="res-e-cancel">Cancel</button>' +
               '<button class="btn btn-blue" id="res-e-save">Save changes</button>' +
             '</div>' +
@@ -356,6 +358,7 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         document.getElementById("res-e-price-wrap").style.display = this.checked ? "" : "none";
       });
       document.getElementById("res-e-save").addEventListener("click", function(){ window.__resUpdate(); });
+      document.getElementById("res-e-delete").addEventListener("click", function(){ window.__resDelete(); });
     }
     // Fill form
     document.getElementById("res-e-link").value = d.url||"";
@@ -409,6 +412,24 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
       setTimeout(function(){ closeResEdit(); window.__resLoad(); }, 800);
     }).catch(function(e){
       say("Could not save: " + (e && e.message ? e.message : "error"), false);
+    });
+  };
+  window.__resDelete = function(){
+    if(!isAdmin()) return;
+    const modal = document.getElementById("res-edit-modal");
+    const key = modal ? modal.dataset.editKey : null;
+    const d = (window.__resData||{})[key];
+    if(!d || !d.id) return;
+    if(!confirm('Delete "' + (d.title||"this resource") + '"? This cannot be undone.')) return;
+    const status = document.getElementById("res-e-status");
+    if(status){ status.textContent = "Deleting..."; status.className = "res-status"; }
+    db.collection("resources").doc(d.id).delete().then(function(){
+      // Clear cache so list refreshes
+      window.__resCache = null;
+      closeResEdit();
+      window.__resLoad();
+    }).catch(function(e){
+      if(status){ status.textContent = "Delete failed: " + (e && e.message ? e.message : "try again"); status.className = "res-status error"; }
     });
   };
 
