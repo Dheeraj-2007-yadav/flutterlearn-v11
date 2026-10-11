@@ -529,7 +529,10 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         <div class="res-card" data-title="${escHtml((r.title||"").toLowerCase())}" data-paid="${paid?"paid":"free"}" ${clickAction} role="button" tabindex="0">
           <div class="res-card-top">
             <span class="res-file-icon">${fileIcon(r.fileType||r.type)}</span>
-            <span class="res-price ${paid?"paid":"free"}">${priceLabel}</span>
+            <span style="display:flex;gap:8px;align-items:center">
+              <span class="res-price ${paid?"paid":"free"}">${priceLabel}</span>
+              <button class="res-edit-btn" data-admin-only style="display:none" onclick="event.stopPropagation();window.__resEdit('${key}')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button>
+            </span>
           </div>
           <h3>${escHtml(r.title)}</h3>
           ${r.description ? `<p>${escHtml(r.description)}</p>` : ``}
