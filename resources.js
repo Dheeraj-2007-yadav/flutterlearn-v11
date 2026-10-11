@@ -511,7 +511,7 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         list.innerHTML = '<div class="card"><p class="muted">No resources yet. Check back soon!</p></div>';
         return;
       }
-      let html = '<div class="resb-grid">';
+      let html = '<div class="learning-list">';
       let idx = 0;
       window.__resData = window.__resData || {};
       snap.forEach(function(doc){
@@ -521,21 +521,21 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         window.__resData[key] = { title: r.title, url: r.storageUrl, id: doc.id,
           category: r.category||"", description: r.description||"",
           fileType: r.fileType||"PDF", paid: paid, price: r.price||"" };
-        const thumb = driveThumb(r.storageUrl);
+        const fileType = escHtml((r.fileType||(r.type==="link"?"PDF":r.type)||"PDF").toUpperCase());
+        const priceTag = paid ? escHtml(fmtPrice(r.price)) : "Free";
+        const action = paid
+          ? `data-paid-note`
+          : `onclick="window.__resPreview(window.__resData['${key}'].title, window.__resData['${key}'].url)"`;
         html += `
-        <div class="card resb-card" data-title="${escHtml((r.title||"").toLowerCase())}" data-paid="${paid?"paid":"free"}">
-          <div class="resb-kicker"><span>${escHtml(r.category||"Resource")} &nbsp;·&nbsp; ${paid ? `<span class="resb-paid-text">Paid</span>` : `<span class="resb-free-text">Free</span>`}</span><button class="resb-edit-btn" data-admin-only style="display:none" onclick="window.__resEdit('${key}')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button></div>
-          <h3 class="resb-title">${escHtml(r.title)}</h3>
-          ${r.description ? `<p class="resb-desc" id="resb-desc-${key}">${escHtml(r.description)}</p><button class="resb-readmore" id="resb-rm-${key}" style="display:none" onclick="window.__resToggleDesc('${key}')">Read more</button>` : ``}
-          <div class="resb-foot">
-            <span class="resb-meta">${escHtml((r.fileType||(r.type==="link"?"PDF":r.type)||"PDF").toUpperCase())}</span>
-            ${paid
-              ? `<button class="btn resb-btn-paid" data-paid-note>${escHtml(fmtPrice(r.price))} &middot; Get access &rarr;</button>`
-              : `<button class="btn btn-blue resb-btn" onclick="window.__resPreview(window.__resData['${key}'].title, window.__resData['${key}'].url)">View resource &rarr;</button>`}
-          </div>
-        </div>`;
+        <a class="lesson-row res-row" data-title="${escHtml((r.title||"").toLowerCase())}" data-paid="${paid?"paid":"free"}" ${action} href="javascript:void(0)">
+          <span class="lesson-num res-icon">${fileIcon(r.fileType||r.type)}</span>
+          <span class="t"><b>${escHtml(r.title)}</b>${r.description ? `<span>${escHtml(r.description)}</span>` : ``}</span>
+          <span class="lesson-meta"><span class="row-tag">${priceTag}</span><span class="row-tag">${fileType}</span><span class="chev">›</span></span>
+        </a>`;
       });
       html += '</div>';
+      // Empty state for filtered views
+      html += '<div class="res-empty" style="display:none"><p class="muted">No resources found. Try a different search.</p></div>';
       list.innerHTML = html;
       // Cache for instant repeat visits
       window.__resCache = { html: html, data: window.__resData };
