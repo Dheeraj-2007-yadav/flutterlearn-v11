@@ -98,9 +98,15 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
     if(!p) return "";
     const s = String(p).trim();
     // Already has currency symbol?
-    if(/^[₹$€£]/.test(s) || /^(INR|USD|Rs\.?)/i.test(s)) return s;
-    // Bare number -> add ₹
-    if(/^[\d,.]+$/.test(s)) return "\u20B9" + s;
+    if(/^[₹$€£]/.test(s) || /^(INR|USD|Rs\.?)/i.test(s)){
+      // Add thousands separator to existing formatted prices
+      return s.replace(/\d+/g, m => Number(m).toLocaleString("en-IN"));
+    }
+    // Bare number -> add ₹ with thousands separator
+    if(/^[\d,.]+$/.test(s)){
+      const n = Number(s.replace(/,/g, ""));
+      return "\u20B9" + n.toLocaleString("en-IN");
+    }
     return s;
   }
 
