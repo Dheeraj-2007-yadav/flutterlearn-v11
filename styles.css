@@ -252,3 +252,6 @@
 .res-card:hover .res-go span{display:inline-block;transform:translateX(3px)}
 .res-edit-btn{width:28px;height:28px;display:grid;place-items:center;border-radius:8px;border:1px solid var(--line);background:var(--bg-elev);color:var(--text-2);cursor:pointer;flex:none}
 .res-edit-btn:hover{color:var(--accent);border-color:var(--accent)}
+.res-delete-btn{color:#e54852;border-color:#e54852}
+.res-delete-btn:hover{background:#e54852;color:#fff}
+.res-edit-actions{display:flex;gap:10px;align-items:center;margin-top:16px}
