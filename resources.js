@@ -487,6 +487,7 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
   window.__resLoad = function(){
     const list = document.getElementById("res-list");
     if(!list) return;
+    const setCount = function(id, n){ const el = document.getElementById(id); if(el) el.textContent = "(" + n + ")"; };
     if(!initData()){
       list.innerHTML = '<div class="card"><p class="muted">Resources are unavailable right now. Please try again later.</p></div>';
       return;
@@ -554,7 +555,6 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         nAll++;
         if(doc.data().freeOrPaid === "paid") nPaid++; else nFree++;
       });
-      const setCount = function(id, n){ const el = document.getElementById(id); if(el) el.textContent = "(" + n + ")"; };
       setCount("res-count-all", nAll);
       setCount("res-count-free", nFree);
       setCount("res-count-paid", nPaid);
