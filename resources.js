@@ -511,7 +511,7 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         list.innerHTML = '<div class="card"><p class="muted">No resources yet. Check back soon!</p></div>';
         return;
       }
-      let html = '<div class="learning-list">';
+      let html = '<div class="res-grid">';
       let idx = 0;
       window.__resData = window.__resData || {};
       snap.forEach(function(doc){
@@ -522,16 +522,21 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
           category: r.category||"", description: r.description||"",
           fileType: r.fileType||"PDF", paid: paid, price: r.price||"" };
         const fileType = escHtml((r.fileType||(r.type==="link"?"PDF":r.type)||"PDF").toUpperCase());
-        const priceTag = paid ? escHtml(fmtPrice(r.price)) : "Free";
-        const action = paid
-          ? `data-paid-note`
-          : `onclick="window.__resPreview(window.__resData['${key}'].title, window.__resData['${key}'].url)"`;
+        const priceLabel = paid ? escHtml(fmtPrice(r.price)) : "Free";
+        const clickAction = paid ? `data-paid-note` : `onclick="window.__resPreview(window.__resData['${key}'].title, window.__resData['${key}'].url)"`;
         html += `
-        <a class="lesson-row res-row" data-title="${escHtml((r.title||"").toLowerCase())}" data-paid="${paid?"paid":"free"}" ${action} href="javascript:void(0)">
-          <span class="lesson-num res-icon">${fileIcon(r.fileType||r.type)}</span>
-          <span class="t"><b>${escHtml(r.title)}</b>${r.description ? `<span>${escHtml(r.description)}</span>` : ``}</span>
-          <span class="lesson-meta"><span class="row-tag">${priceTag}</span><span class="row-tag">${fileType}</span><span class="chev">›</span></span>
-        </a>`;
+        <div class="res-card" data-title="${escHtml((r.title||"").toLowerCase())}" data-paid="${paid?"paid":"free"}" ${clickAction} role="button" tabindex="0">
+          <div class="res-card-top">
+            <span class="res-file-icon">${fileIcon(r.fileType||r.type)}</span>
+            <span class="res-price ${paid?"paid":"free"}">${priceLabel}</span>
+          </div>
+          <h3>${escHtml(r.title)}</h3>
+          ${r.description ? `<p>${escHtml(r.description)}</p>` : ``}
+          <div class="res-card-foot">
+            <span class="res-type">${fileType}</span>
+            <span class="res-go">${paid ? "Get access" : "View"} <span>→</span></span>
+          </div>
+        </div>`;
       });
       html += '</div>';
       // Empty state for filtered views
