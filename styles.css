@@ -236,3 +236,6 @@
 .view{animation:viewEnter .3s cubic-bezier(.22,1,.36,1)}
 @keyframes viewEnter{from{opacity:0;transform:translateX(28px) scale(.985)}to{opacity:1;transform:translateX(0) scale(1)}}
 @media (prefers-reduced-motion:reduce){.view{animation:none}}
+.lesson-row,.quiz-row,.feature-row,.continue-card{content-visibility:auto;contain-intrinsic-size:auto 80px}
+.resource-card{content-visibility:auto;contain-intrinsic-size:auto 280px}
+.stat{contain:layout style}
