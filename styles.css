@@ -233,3 +233,6 @@
 .codeblock .tok-c{color:#8a9bb0;font-style:italic}
 .codeblock .tok-f{color:#9ecbff}
 .codeblock .tok-a{color:#4fe3c1}
+.view{animation:viewEnter .38s cubic-bezier(.22,1,.36,1)}
+@keyframes viewEnter{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){.view{animation:none}}
