@@ -491,6 +491,21 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
       list.innerHTML = '<div class="card"><p class="muted">Resources are unavailable right now. Please try again later.</p></div>';
       return;
     }
+    // Use cached data if available (instant load on repeat visits)
+    if(window.__resCache && window.__resCache.html){
+      list.innerHTML = window.__resCache.html;
+      window.__resData = window.__resCache.data;
+      if(isAdmin()){ list.querySelectorAll("[data-admin-only]").forEach(function(el){ el.style.display = ""; }); }
+      // Restore filter counts from cached data
+      let nAll = 0, nFree = 0, nPaid = 0;
+      Object.values(window.__resData).forEach(function(r){
+        nAll++; if(r.paid) nPaid++; else nFree++;
+      });
+      setCount("res-count-all", nAll);
+      setCount("res-count-free", nFree);
+      setCount("res-count-paid", nPaid);
+      return;
+    }
     db.collection("resources").orderBy("uploadedAt","desc").get().then(function(snap){
       if(snap.empty){
         list.innerHTML = '<div class="card"><p class="muted">No resources yet. Check back soon!</p></div>';
@@ -509,7 +524,7 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
         const thumb = driveThumb(r.storageUrl);
         html += `
         <div class="card resb-card" data-title="${escHtml((r.title||"").toLowerCase())}" data-paid="${paid?"paid":"free"}">
-          <div class="resb-kicker"><span>${escHtml(r.category||"Resource")} &nbsp;·&nbsp; ${paid ? `<span class="resb-paid-text">${escHtml(fmtPrice(r.price)||"Paid")}</span>` : `<span class="resb-free-text">Free</span>`}</span><button class="resb-edit-btn" data-admin-only style="display:none" onclick="window.__resEdit('${key}')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button></div>
+          <div class="resb-kicker"><span>${escHtml(r.category||"Resource")} &nbsp;·&nbsp; ${paid ? `<span class="resb-paid-text">Paid</span>` : `<span class="resb-free-text">Free</span>`}</span><button class="resb-edit-btn" data-admin-only style="display:none" onclick="window.__resEdit('${key}')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button></div>
           <h3 class="resb-title">${escHtml(r.title)}</h3>
           ${r.description ? `<p class="resb-desc" id="resb-desc-${key}">${escHtml(r.description)}</p><button class="resb-readmore" id="resb-rm-${key}" style="display:none" onclick="window.__resToggleDesc('${key}')">Read more</button>` : ``}
           <div class="resb-foot">
@@ -522,6 +537,8 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
       });
       html += '</div>';
       list.innerHTML = html;
+      // Cache for instant repeat visits
+      window.__resCache = { html: html, data: window.__resData };
       // Show admin-only edit buttons
       if(isAdmin()){
         list.querySelectorAll("[data-admin-only]").forEach(function(el){ el.style.display = ""; });
