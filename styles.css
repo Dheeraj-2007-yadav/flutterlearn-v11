@@ -250,3 +250,5 @@
 .res-go{font-size:13px;font-weight:700;color:var(--accent)}
 .res-go span{transition:transform .2s}
 .res-card:hover .res-go span{display:inline-block;transform:translateX(3px)}
+.res-edit-btn{width:28px;height:28px;display:grid;place-items:center;border-radius:8px;border:1px solid var(--line);background:var(--bg-elev);color:var(--text-2);cursor:pointer;flex:none}
+.res-edit-btn:hover{color:var(--accent);border-color:var(--accent)}
