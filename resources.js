@@ -626,4 +626,9 @@ const ADMIN_EMAIL = "dy78dy77@gmail.com";
       if((location.hash||"").startsWith("#/resources") && window.route) window.route();
     });
   }
+
+  // 7. Re-route if page loaded directly on #/resources (app.js ran before this file loaded)
+  if((location.hash||"").startsWith("#/resources") && window.route){
+    window.route();
+  }
 })();
